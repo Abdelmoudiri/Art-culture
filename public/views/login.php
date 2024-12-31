@@ -31,7 +31,7 @@
                 </div>
                 <div class="relative">
                 <button class="bg-cyan-500 text-white rounded-md px-2 py-1">Submit</button>
-                <a href="index.php?action=register" class="bg-cyan-500 text-white rounded-md px-2 py-1">create account</a>
+                <a href="register.php" class="bg-cyan-500 text-white rounded-md px-2 py-1">create account</a>
                 </div>
             </div>
             </div>

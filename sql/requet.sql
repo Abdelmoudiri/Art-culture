@@ -3,6 +3,7 @@ CREATE DATABASE art_culture;
 use art_culture;
 
 -- Table des utilisateurs 
+
 CREATE TABLE User (
     id_user INT AUTO_INCREMENT PRIMARY KEY,
     firstname VARCHAR(50),
@@ -10,8 +11,16 @@ CREATE TABLE User (
     email VARCHAR(100) UNIQUE,
     role VARCHAR(20) DEFAULT 'visiteur',
     password VARCHAR(255),
-    date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_deleted BOOLEAN DEFAULT false
 );
+
+insert into `user`(firstname,lastname,email,role,password) VALUES
+("abdeljabbar","moudiri","amoudiri@gmail.com","admin","moudiri"),
+("ahmed","sari","ahmed@gmail.com","auteur","ahmed"),
+("salma","salamat","salma@gmail.com","visiteur","salma");
+
+select * from User;
 -- categorie
 
 CREATE TABLE Categorie (
