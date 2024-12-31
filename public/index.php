@@ -4,7 +4,7 @@ if (isset($_GET['action'])) {
 
     switch ($action) {
         case 'login':
-            header('Location: /views/login.php');
+            include_once __DIR__ . "/views/login.php";
             break;
         case 'register':
             header('Location: /views/register.php');
