@@ -7,14 +7,15 @@ if (isset($_GET['action'])) {
             include_once __DIR__ . "/views/login.php";
             break;
         case 'register':
-            header('Location: /views/register.php');
+            include_once __DIR__ . "/views/login.php";
             break;
         default:
-            header('Location: ./index.php');
+            include_once __DIR__ . "/views/VisiteurDashboard.php";
             break;
     }
 } else {
-    header('Location: ./index.php');
+    include_once __DIR__ . "/views/VisiteurDashboard.php";
+
 }
 exit; 
 ?>

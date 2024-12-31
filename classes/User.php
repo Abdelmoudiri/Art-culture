@@ -17,7 +17,7 @@ class User{
             $this->password=$password;
             $this->role=$role;
         }
-        
+
         //setters & getters
         public function getNom() {
             return $this->nom;
@@ -63,7 +63,7 @@ class User{
         {
             try{
 
-            include_once 'database.php';
+            require_once 'database.php';
             $query="select email,password from User where email = :email";
             $stmt=$conn->prepare($query);
             $stmt->bindParam(':email',$email,PDO::PARAM_STR);
