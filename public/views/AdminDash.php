@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . "/../../classes/User.php";
+require_once __DIR__ . "/../../classes/Categorie.php";
+require_once __DIR__ . "/../../classes/Article.php";
 
 $id_user = isset($_GET['id']) ? $_GET['id'] : null;
 
@@ -9,7 +11,18 @@ if ($id_user) {
 } else {
     echo "ID utilisateur non fourni.";
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nom = $_POST['category-name'];
+    $description = $_POST['category-description'];
 
+    $categorie = new Categorie(); 
+
+    if ($categorie->addCategory($nom, $description)) {
+        echo "Catégorie ajoutée avec succès.";
+    } else {
+        echo "Erreur lors de l'ajout de la catégorie.";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -175,6 +188,61 @@ if ($id_user) {
                                         echo '<p class="text-red-500">Erreur : ' . $e->getMessage() . '</p>';
                                     }
                             ?>
+                            <script>
+                                    function supprimerArticle(idArticle) {
+                                        if (confirm("Êtes-vous sûr de vouloir supprimer cet article ?")) {
+                                            // Créer la requête AJAX
+                                            var xhr = new XMLHttpRequest();
+                                            xhr.open("POST", "supprimer_article.php", true);
+                                            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                                            xhr.onload = function() {
+                                                if (xhr.status == 200) {
+                                                    alert(xhr.responseText); // Afficher un message de succès ou d'erreur
+                                                    location.reload(); // Recharger la page pour afficher les articles mis à jour
+                                                } else {
+                                                    alert("Une erreur s'est produite lors de la suppression.");
+                                                }
+                                            };
+                                            xhr.send("idArticle=" + idArticle); // Envoyer l'ID de l'article à supprimer
+                                        }
+                                    }
+                                    function acceptArticle(idArticle) {
+                                        if (confirm("Êtes-vous sûr de vouloir accepter cet article ?")) {
+                                            // Créer la requête AJAX pour accepter l'article
+                                            var xhr = new XMLHttpRequest();
+                                            xhr.open("POST", "accepter_article.php", true);
+                                            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                                            xhr.onload = function() {
+                                                if (xhr.status == 200) {
+                                                    alert(xhr.responseText); // Afficher un message de succès ou d'erreur
+                                                    location.reload(); // Recharger la page pour afficher les articles mis à jour
+                                                } else {
+                                                    alert("Une erreur s'est produite lors de l'acceptation de l'article.");
+                                                }
+                                            };
+                                            xhr.send("idArticle=" + idArticle); // Envoyer l'ID de l'article à accepter
+                                        }
+                                    }
+
+                                    function rejectArticle(idArticle) {
+                                        if (confirm("Êtes-vous sûr de vouloir refuser cet article ?")) {
+                                            // Créer la requête AJAX pour refuser l'article
+                                            var xhr = new XMLHttpRequest();
+                                            xhr.open("POST", "refuser_article.php", true);
+                                            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                                            xhr.onload = function() {
+                                                if (xhr.status == 200) {
+                                                    alert(xhr.responseText); // Afficher un message de succès ou d'erreur
+                                                    location.reload(); // Recharger la page pour afficher les articles mis à jour
+                                                } else {
+                                                    alert("Une erreur s'est produite lors du refus de l'article.");
+                                                }
+                                            };
+                                            xhr.send("idArticle=" + idArticle); // Envoyer l'ID de l'article à refuser
+                                        }
+                                    }
+                            </script>
+
 
                             <div class="flex justify-end">
                                 <button class="bg-red-500 text-white py-2 px-4 rounded-md" onclick="closeViewArticlesPopup()">Fermer</button>
@@ -227,13 +295,7 @@ if ($id_user) {
                         </div>
                     </div>
                     <script>
-                        function acceptArticle(articleId) {
-                            alert("Article " + articleId + " accepté !");
-                        }
-
-                        function rejectArticle(articleId) {
-                            alert("Article " + articleId + " refusé !");
-                        }
+                        
 
                         function closeAddArticlePopup() {
                             document.getElementById("add-article-popup").classList.add("hidden");
@@ -257,101 +319,96 @@ if ($id_user) {
 
 
                     <!-- cattt -->
-                <section id="gestion-categories" class="section hidden">
-                    <div class="bg-white p-6 rounded-lg shadow-md">
-                        <h2 class="text-2xl font-bold text-gray-800 mb-4">Gestion des Catégories</h2>
-                        <p class="text-gray-600 mb-4">Créer, modifier et gérer les catégories des articles.</p>
+                    <?php
+                        $categories = Categorie::getAllCategories();
+                    ?>
+                    <section id="gestion-categories" class="section hidden">
+                            <div class="bg-white p-6 rounded-lg shadow-md">
+                                <h2 class="text-2xl font-bold text-gray-800 mb-4">Gestion des Catégories</h2>
+                                <p class="text-gray-600 mb-4">Créer, modifier et gérer les catégories des articles.</p>
 
-                        <!-- Boutons Voir et Ajouter Catégorie -->
-                        <div class="flex justify-between items-center mb-6">
-                            <a href="#" class="bg-blue-500 text-white py-2 px-4 rounded-md">Voir Catégories</a>
-                            <button onclick="openAddCategoryPopup()" class="bg-green-500 text-white py-2 px-4 rounded-md">Ajouter Catégorie</button>
-                        </div>
+                                <!-- Boutons Voir et Ajouter Catégorie -->
+                                <div class="flex justify-between items-center mb-6">
+                                    <a href="#" class="bg-blue-500 text-white py-2 px-4 rounded-md">Voir Catégories</a>
+                                    <button onclick="openAddCategoryPopup()" class="bg-green-500 text-white py-2 px-4 rounded-md">Ajouter Catégorie</button>
+                                </div>
 
-                        <!-- Liste des catégories -->
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse mb-4">
-                                <thead>
-                                    <tr>
-                                        <th class="px-4 py-2 border-b">Nom de la Catégorie</th>
-                                        <th class="px-4 py-2 border-b">Description</th>
-                                        <th class="px-4 py-2 border-b">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Exemple de catégories statiques -->
-                                    <tr>
-                                        <td class="px-4 py-2">Technologie</td>
-                                        <td class="px-4 py-2">Articles sur la technologie moderne.</td>
-                                        <td class="px-4 py-2">
-                                            <button class="bg-yellow-500 text-white py-1 px-3 rounded-md" onclick="openEditCategoryPopup(1)">Modifier</button>
-                                            <button class="bg-red-500 text-white py-1 px-3 rounded-md" onclick="deleteCategory(1)">Supprimer</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-4 py-2">Science</td>
-                                        <td class="px-4 py-2">Articles sur la science et les découvertes.</td>
-                                        <td class="px-4 py-2">
-                                            <button class="bg-yellow-500 text-white py-1 px-3 rounded-md" onclick="openEditCategoryPopup(2)">Modifier</button>
-                                            <button class="bg-red-500 text-white py-1 px-3 rounded-md" onclick="deleteCategory(2)">Supprimer</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-4 py-2">Santé</td>
-                                        <td class="px-4 py-2">Articles sur la santé et le bien-être.</td>
-                                        <td class="px-4 py-2">
-                                            <button class="bg-yellow-500 text-white py-1 px-3 rounded-md" onclick="openEditCategoryPopup(3)">Modifier</button>
-                                            <button class="bg-red-500 text-white py-1 px-3 rounded-md" onclick="deleteCategory(3)">Supprimer</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                               <!-- Liste des catégories -->
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left border-collapse mb-4">
+                                        <thead>
+                                            <tr>
+                                                <th class="px-4 py-2 border-b">Nom de la Catégorie</th>
+                                                <th class="px-4 py-2 border-b">Description</th>
+                                                <th class="px-4 py-2 border-b">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php 
+                                            $categories = Categorie::getAllCategories();
+                                            foreach ($categories as $category): ?>
+                                            <tr>
+                                                <td class="px-4 py-2"><?= htmlspecialchars($category['nom']); ?></td>
+                                                <td class="px-4 py-2"><?= htmlspecialchars($category['description']); ?></td>
+                                                <td class="px-4 py-2">
+                                                    <!-- Correction ici : remplacer article par category -->
+                                                    <button class="bg-yellow-500 text-white py-1 px-3 rounded-md" onclick="openEditCategoryPopup(<?= $category['id_categorie']; ?>)">Modifier</button>
+                                                    <button class="bg-red-500 text-white py-1 px-3 rounded-md" onclick="deleteCategory(<?= $category['id_categorie']; ?>)">Supprimer</button>
+                                                </td>
+                                            </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
 
-                        <!-- Popup Ajouter Catégorie -->
-                        <div id="add-category-popup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden">
-                            <div class="bg-white p-8 rounded-lg shadow-lg w-1/3">
-                                <h3 class="text-2xl font-semibold mb-4">Ajouter une Nouvelle Catégorie</h3>
-                                <form action="add_category.php" method="POST">
-                                    <div class="mb-4">
-                                        <label for="category-name" class="block text-sm font-medium text-gray-700">Nom de la Catégorie</label>
-                                        <input type="text" name="category-name" id="category-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="category-description" class="block text-sm font-medium text-gray-700">Description</label>
-                                        <textarea name="category-description" id="category-description" rows="4" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required></textarea>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded-md">Ajouter</button>
-                                        <button type="button" class="bg-red-500 text-white py-2 px-4 rounded-md" onclick="closeAddCategoryPopup()">Annuler</button>
-                                    </div>
-                                </form>
+
+                            <!-- Popup Ajouter Catégorie -->
+                            <div id="add-category-popup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden">
+                                <div class="bg-white p-8 rounded-lg shadow-lg w-1/3">
+                                    <h3 class="text-2xl font-semibold mb-4">Ajouter une Nouvelle Catégorie</h3>
+                                    <form action="#" method="POST">
+                                        <div class="mb-4">
+                                            <label for="category-name" class="block text-sm font-medium text-gray-700">Nom de la Catégorie</label>
+                                            <input type="text" name="category-name" id="category-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="category-description" class="block text-sm font-medium text-gray-700">Description</label>
+                                            <textarea name="category-description" id="category-description" rows="4" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required></textarea>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded-md">Ajouter</button>
+                                            <button type="button" class="bg-red-500 text-white py-2 px-4 rounded-md" onclick="closeAddCategoryPopup()">Annuler</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Popup Modifier Catégorie -->
-                        <div id="edit-category-popup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden">
-                            <div class="bg-white p-8 rounded-lg shadow-lg w-1/3">
-                                <h3 class="text-2xl font-semibold mb-4">Modifier la Catégorie</h3>
-                                <form action="edit_category.php" method="POST">
-                                    <div class="mb-4">
-                                        <label for="edit-category-name" class="block text-sm font-medium text-gray-700">Nom de la Catégorie</label>
-                                        <input type="text" name="edit-category-name" id="edit-category-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="edit-category-description" class="block text-sm font-medium text-gray-700">Description</label>
-                                        <textarea name="edit-category-description" id="edit-category-description" rows="4" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required></textarea>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded-md">Modifier</button>
-                                        <button type="button" class="bg-red-500 text-white py-2 px-4 rounded-md" onclick="closeEditCategoryPopup()">Annuler</button>
-                                    </div>
-                                </form>
+                            <!-- Popup Modifier Catégorie -->
+                            <div id="edit-category-popup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden">
+                                <div class="bg-white p-8 rounded-lg shadow-lg w-1/3">
+                                    <h3 class="text-2xl font-semibold mb-4">Modifier la Catégorie</h3>
+                                    <form action="edit_category.php" method="POST">
+                                        <div class="mb-4">
+                                            <label for="edit-category-name" class="block text-sm font-medium text-gray-700">Nom de la Catégorie</label>
+                                            <input type="text" name="edit-category-name" id="edit-category-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="edit-category-description" class="block text-sm font-medium text-gray-700">Description</label>
+                                            <textarea name="edit-category-description" id="edit-category-description" rows="4" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required></textarea>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded-md">Modifier</button>
+                                            <button type="button" class="bg-red-500 text-white py-2 px-4 rounded-md" onclick="closeEditCategoryPopup()">Annuler</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
-                        </div>
 
-                </section>
+                    </section>
+
+                    
+                
+
                 <section id="gestion-utilisateurs" class="section hidden">
                             <div class="bg-white p-6 rounded-lg shadow-md">
                                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Gestion des Utilisateurs</h2>

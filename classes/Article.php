@@ -95,26 +95,44 @@ class Article
         }
     }
 
-    public static function refuser($idArticle)
-        {
-            try {
-                $pdo = DatabaseConnection::getInstance()->getConnection();
-                
-                // Mise à jour de l'état de l'article à "Refusé"
-                $sql = "UPDATE Article SET etat = 'Refusé' WHERE id_article = :idArticle AND etat = 'En attente'";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([':idArticle' => $idArticle]);
-
-                // Vérifier si l'article a bien été mis à jour
-                if ($stmt->rowCount() == 0) {
-                    throw new Exception("Aucun article trouvé avec l'ID $idArticle ou l'article n'était pas en attente.");
-                }
-
-                return "L'article a été refusé avec succès.";
-            } catch (PDOException $e) {
-                throw new Exception("Erreur lors de la mise à jour de l'état de l'article : " . $e->getMessage());
+    public static function accepter($idArticle)
+    {
+        try {
+            $pdo = DatabaseConnection::getInstance()->getConnection();
+            $sql = "UPDATE Article SET etat = 'Accepter' WHERE id_article = :idArticle AND etat = 'En attente'";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([':idArticle' => $idArticle]);
+    
+            // Vérifier si la requête a affecté des lignes (article trouvé et mis à jour)
+            if ($stmt->rowCount() == 0) {
+                throw new Exception("Aucun article trouvé avec l'ID $idArticle ou l'article n'était pas en attente.");
             }
+    
+            return "L'article a été accepté avec succès."; // Message corrigé
+        } catch (PDOException $e) {
+            throw new Exception("Erreur lors de la mise à jour de l'état de l'article : " . $e->getMessage());
         }
+    }
+    
+        
+    public static function refuser($idArticle)
+{
+    try {
+        $pdo = DatabaseConnection::getInstance()->getConnection();
+        $sql = "UPDATE Article SET etat = 'Refuser' WHERE id_article = :idArticle AND etat = 'En attente'";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([':idArticle' => $idArticle]);
+
+        // Vérifier si la requête a affecté des lignes (article trouvé et mis à jour)
+        if ($stmt->rowCount() == 0) {
+            throw new Exception("Aucun article trouvé avec l'ID $idArticle ou l'article n'était pas en attente.");
+        }
+
+        return "L'article a été refusé avec succès.";
+    } catch (PDOException $e) {
+        throw new Exception("Erreur lors de la mise à jour de l'état de l'article : " . $e->getMessage());
+    }
+}
 
     public static function delete($idArticle)
     {

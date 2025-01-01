@@ -27,14 +27,21 @@ CREATE TABLE Categorie (
     id_categorie INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(50) NOT NULL
 );
-INSERT INTO Categorie (nom)
+
+SET foreign_key_checks = 0;
+TRUNCATE TABLE Categorie;
+SET foreign_key_checks = 1;
+
+
+INSERT INTO Categorie (nom, description)
 VALUES
-    ('Programmation'),
-    ('Sécurité Informatique'),
-    ('Développement Web'),
-    ('Bases de Données'),
-    ('JavaScript'),
-    ('Technologies Emergentes');
+    ('Programmation', 'Apprentissage des langages de programmation et des concepts de base de la programmation informatique'),
+    ('Sécurité Informatique', 'Formation sur la protection des systèmes informatiques contre les attaques et les menaces'),
+    ('Développement Web', 'Création de sites web et d’applications en utilisant des technologies web modernes'),
+    ('Bases de Données', 'Gestion des données à l’aide des systèmes de gestion de bases de données relationnelles et non relationnelles'),
+    ('JavaScript', 'Apprentissage du langage de programmation JavaScript pour le développement web dynamique'),
+    ('Technologies Emergentes', 'Étude des nouvelles technologies et des tendances dans le domaine de l’informatique');
+
 
 
 -- article
