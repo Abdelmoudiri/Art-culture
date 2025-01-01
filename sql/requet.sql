@@ -27,6 +27,15 @@ CREATE TABLE Categorie (
     id_categorie INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(50) NOT NULL
 );
+INSERT INTO Categorie (nom)
+VALUES
+    ('Programmation'),
+    ('Sécurité Informatique'),
+    ('Développement Web'),
+    ('Bases de Données'),
+    ('JavaScript'),
+    ('Technologies Emergentes');
+
 
 -- article
 CREATE TABLE Article (
@@ -41,6 +50,16 @@ CREATE TABLE Article (
     FOREIGN KEY (id_categorie) REFERENCES Categorie(id_categorie),
     FOREIGN KEY (id_auteur) REFERENCES User(id_user)
 );
+INSERT INTO Article (titre, content, datePublication, image, etat, id_categorie, id_auteur)
+VALUES
+    ('Introduction à la Programmation', 'Cet article explore les bases de la programmation.', '2025-01-01', 'programming_intro.jpg', 'Publié', 1, 2),
+    ('L\'importance de la Sécurité Informatique', 'Découvrez pourquoi la sécurité est essentielle dans le monde numérique.', '2025-01-02', 'cybersecurity.jpg', 'Publié', 2, 3),
+    ('Guide Complet sur le PHP', 'Un guide détaillé pour apprendre PHP de zéro.', '2025-01-03', 'php_guide.jpg', 'En attente', 3, 1),
+    ('Les Tendances du Web en 2025', 'Les nouveautés et les tendances dans le domaine du développement web.', '2025-01-04', 'web_trends.jpg', 'Publié', 4, 2),
+    ('Bases de Données Modernes', 'Une introduction aux bases de données relationnelles et NoSQL.', '2025-01-05', 'databases.jpg', 'En attente', 5, 3),
+    ('Les Meilleurs Frameworks en JavaScript', 'Une analyse des frameworks JavaScript les plus populaires.', '2025-01-06', 'js_frameworks.jpg', 'Publié', 1, 2);
+
+SELECT * FROM Article WHERE etat = 'En attente';
 
 
 
