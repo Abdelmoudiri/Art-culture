@@ -1,3 +1,17 @@
+<?php
+require_once __DIR__ . "/../../classes/User.php";
+
+$id_user = isset($_GET['id']) ? $_GET['id'] : null;
+
+if ($id_user) {
+    $user = User::getUserById($id_user);
+
+} else {
+    echo "ID utilisateur non fourni.";
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,6 +44,14 @@
                 </svg>
                 <span>Gestion des Utilisateurs</span>
             </a>
+            <a href="logout.php" class="flex items-center space-x-3 text-lg hover:text-white bg-red-500 hover:bg-red-700 py-2 px-4 rounded-md mt-6">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2h-5V4H2v16h15z"></path>
+                </svg>
+                <span>Logout</span>
+            </a>
+
+
         </nav>
     </aside>
 
@@ -37,7 +59,7 @@
     <main class="ml-64 p-8">
         <!-- Header Section -->
         <header class="mb-8">
-            <h1 class="text-3xl font-semibold text-gray-900">Bienvenue, Admin</h1>
+            <h1 class="text-3xl font-semibold text-gray-900">Bienvenue, <span class="text-3xl font-semibold text-red-900"> <?php  echo   htmlspecialchars($user['firstname']) . " " . htmlspecialchars($user['lastname']);?></span></h1>
             <p class="text-lg text-gray-600">Gérez le contenu et les utilisateurs de la plateforme.</p>
         </header>
 

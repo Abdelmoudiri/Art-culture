@@ -23,7 +23,7 @@ class DatabaseConnection {
     }
 
     public function getConnection() {
-        echo 'connecté <br>';
+        
         return $this->connection; 
 
     }

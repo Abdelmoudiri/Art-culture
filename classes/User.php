@@ -2,7 +2,7 @@
 
 // include_once 'database.php';
 
-class User{
+    class User{
         private $nom;
         private $prenom;
         private $email;
@@ -64,12 +64,12 @@ class User{
             try{
 
             require_once 'database.php';
-            $query="select email,password from User where email = :email";
+            $query="select * from User where email = :email";
             $stmt=$conn->prepare($query);
             $stmt->bindParam(':email',$email,PDO::PARAM_STR);
             $stmt->execute();
             $user=$stmt->fetch(PDO::FETCH_ASSOC); 
-            if($user && $user["password"])
+            if($user && $user["password"]===$password)
             {
                 return $user;
             }else{
@@ -80,7 +80,20 @@ class User{
                 die("la connexion a echoué : ".$e->getMessage());
             }
         }
+        public static function getUserById($id_user){
+            try {
+                require_once 'database.php';
+                $query = "SELECT * FROM User WHERE id_user = :id_user";
+                $stmt = $conn->prepare($query);
 
-}
+                $stmt->bindParam(':id_user', $id_user, PDO::PARAM_INT);
+                $stmt->execute();
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                return $user;
+            } catch (PDOException $e) {
+                die("Erreur : " . $e->getMessage());
+            }
+        }
+    }
 
 ?>
