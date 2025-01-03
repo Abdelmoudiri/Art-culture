@@ -75,6 +75,24 @@ class User {
             die("La connexion a échoué : " . $e->getMessage());
         }
     }
+    public function getIdUser($email) {
+        try {
+            $conn = DatabaseConnection::getInstance()->getConnection();
+            $query = "SELECT id_user FROM User WHERE email = :email";
+            $stmt = $conn->prepare($query);
+            $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+            $stmt->execute();
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($user) {
+                return $user['id_user'];
+            } else {
+                return null; 
+            }
+        } catch (PDOException $e) {
+            die("La connexion a échoué : " . $e->getMessage());
+        }
+    }
 
     public static function getUserById($id_user) {
         try {

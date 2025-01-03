@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . "/../../classes/User.php";
+require_once __DIR__ . "/../../classes/Admin.php";
 require_once __DIR__ . "/../../classes/Categorie.php";
 require_once __DIR__ . "/../../classes/Article.php";
 
@@ -412,233 +413,278 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
 
                     </section>
+                    <!-- cat script -->
+                    <script>
+                                    function openEditCategoryPopup(categoryId) {
+                                const category = document.querySelector(`[data-category-id="${categoryId}"]`);
+                                if (!category) {
+                                    alert("Catégorie introuvable !");
+                                    return;
+                                }
+
+                                document.getElementById("edit-category-id").value = categoryId;
+                                document.getElementById("edit-category-name").value = category.dataset.name;
+                                document.getElementById("edit-category-description").value = category.dataset.description;
+
+                                document.getElementById("edit-category-popup").classList.remove("hidden");
+                               }
+
+                            function closeEditCategoryPopup() {
+                                document.getElementById("edit-category-popup").classList.add("hidden");
+                                document.getElementById("edit-category-form").reset();
+                                document.getElementById("edit-message").classList.add("hidden");
+                            }
+
+                            function openAddCategoryPopup() {
+                                document.getElementById("add-category-popup").classList.remove("hidden");
+                            }
+                            function closeAddCategoryPopup() {
+                                document.getElementById("add-category-popup").classList.add("hidden");
+                            }
+
+                            
+
+
+
+                            
+                            function closeEditCategoryPopup() {
+                                document.getElementById("edit-category-popup").classList.add("hidden");
+                            }
+
+                            
+                            function deleteCategory(categoryId) {
+                                        if (confirm("Êtes-vous sûr de vouloir supprimer cette catégorie ?")) {
+                                            fetch("delete_category.php", {
+                                                method: "POST",
+                                                headers: {
+                                                    "Content-Type": "application/x-www-form-urlencoded",
+                                                },
+                                                body: `action=delete&id=${categoryId}`, // Indique l'action et l'ID de la catégorie
+                                            })
+                                                .then(response => {
+                                                    if (!response.ok) {
+                                                        return response.text().then(text => { throw new Error(text); });
+                                                    }
+                                                    return response.json();
+                                                })
+                                                .then(data => {
+                                                    if (data.success) {
+                                                        alert("Catégorie supprimée avec succès.");
+                                                        document.querySelector(`[data-category-id="${categoryId}"]`).remove();
+                                                    } else {
+                                                        alert(data.message || "Erreur lors de la suppression de la catégorie.");
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    console.error("Erreur détectée:", error);
+                                                    alert(`Erreur: ${error.message}`);
+                                                });
+                                        }
+                                    }
+                    </script>
 
                     
                 
 
-                <section id="gestion-utilisateurs" class="section hidden">
-                            <div class="bg-white p-6 rounded-lg shadow-md">
-                                <h2 class="text-2xl font-bold text-gray-800 mb-4">Gestion des Utilisateurs</h2>
-                                <p class="text-gray-600 mb-4">Consulter et gérer les profils des utilisateurs.</p>
+                    <section id="gestion-utilisateurs" class="section hidden">
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">Gestion des Utilisateurs</h2>
+                            <p class="text-gray-600 mb-4">Consulter et gérer les profils des utilisateurs.</p>
 
-                                <!-- Liste des utilisateurs -->
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-left border-collapse mb-4">
-                                        <thead>
-                                            <tr>
-                                                <th class="px-4 py-2 border-b">Nom</th>
-                                                <th class="px-4 py-2 border-b">Email</th>
-                                                <th class="px-4 py-2 border-b">Rôle</th>
-                                                <th class="px-4 py-2 border-b">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <!-- Exemple d'utilisateurs statiques -->
-                                            <?php 
-                                            echo ' <tr>
-                                                <td class="px-4 py-2">Jean Dupont</td>
-                                                <td class="px-4 py-2">jean.dupont@example.com</td>
-                                                <td class="px-4 py-2">Administrateur</td>
-                                                <td class="px-4 py-2">
-                                                    <button class="bg-yellow-500 text-white py-1 px-3 rounded-md" onclick="openEditUserPopup(1)">Modifier</button>
-                                                    <button class="bg-red-500 text-white py-1 px-3 rounded-md" onclick="confirmDeleteUser(1)">Supprimer</button>
-                                                </td>
-                                            </tr>';
+                            <!-- Liste des utilisateurs -->
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse mb-4">
+                                    <thead>
+                                        <tr>
+                                            <th class="px-4 py-2 border-b">Nom</th>
+                                            <th class="px-4 py-2 border-b">Email</th>
+                                            <th class="px-4 py-2 border-b">Rôle</th>
+                                            <th class="px-4 py-2 border-b">Actions</th>
+                                        </tr>
+                                    </thead>
+                                        <tbody id="user-list">
+                                        <?php
+                                                $utilisateurs = Admin::getAllUtilisateur();
+                                                var_dump($utilisateur);
+                                                if (!empty($utilisateurs)) {
+                                                    foreach ($utilisateurs as $utilisateur) {
+                                                        echo "<tr id='user-" . $utilisateur['id'] . "'>";
+                                                        echo "<td class='px-4 py-2'>" . htmlspecialchars($utilisateur['firstname']) . " " . htmlspecialchars($utilisateur['lastname']) . "</td>";
+                                                        echo "<td class='px-4 py-2'>" . htmlspecialchars($utilisateur['email']) . "</td>";
+                                                        echo "<td class='px-4 py-2'>" . htmlspecialchars($utilisateur['role']) . "</td>";
+                                                        echo "<td class='px-4 py-2'>
+                                                                <button class='bg-yellow-500 text-white py-1 px-3 rounded-md' onclick='openEditUserPopup(" . $utilisateur['id'] . ")'>Modifier</button>
+                                                                <button class='bg-red-500 text-white py-1 px-3 rounded-md' onclick='confirmDeleteUser(" . $utilisateur['id'] . ")'>Supprimer</button>
+                                                            </td>";
+                                                        echo "</tr>";
+                                                    }
+                                                } else {
+                                                    echo "<tr><td colspan='4' class='px-4 py-2 text-center'>Aucun utilisateur trouvé</td></tr>";
+                                                }
                                             ?>
-                                            <tr>
-                                                <td class="px-4 py-2">Marie Durand</td>
-                                                <td class="px-4 py-2">marie.durand@example.com</td>
-                                                <td class="px-4 py-2">Utilisateur</td>
-                                                <td class="px-4 py-2">
-                                                    <button class="bg-yellow-500 text-white py-1 px-3 rounded-md" onclick="openEditUserPopup(2)">Modifier</button>
-                                                    <button class="bg-red-500 text-white py-1 px-3 rounded-md" onclick="confirmDeleteUser(2)">Supprimer</button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="px-4 py-2">Pierre Martin</td>
-                                                <td class="px-4 py-2">pierre.martin@example.com</td>
-                                                <td class="px-4 py-2">Utilisateur</td>
-                                                <td class="px-4 py-2">
-                                                    <button class="bg-yellow-500 text-white py-1 px-3 rounded-md" onclick="openEditUserPopup(3)">Modifier</button>
-                                                    <button class="bg-red-500 text-white py-1 px-3 rounded-md" onclick="confirmDeleteUser(3)">Supprimer</button>
-                                                </td>
-                                            </tr>
                                         </tbody>
-                                    </table>
-                                </div>
+                                </table>
                             </div>
+                        </div>
 
-                            <!-- Popup Modifier Utilisateur -->
-                            <div id="edit-user-popup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden">
-                                <div class="bg-white p-8 rounded-lg shadow-lg w-1/3">
-                                    <h3 class="text-2xl font-semibold mb-4">Modifier Utilisateur</h3>
-                                    <form action="edit_user.php" method="POST">
-                                        <div class="mb-4">
-                                            <label for="edit-user-name" class="block text-sm font-medium text-gray-700">Nom</label>
-                                            <input type="text" name="edit-user-name" id="edit-user-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label for="edit-user-email" class="block text-sm font-medium text-gray-700">Email</label>
-                                            <input type="email" name="edit-user-email" id="edit-user-email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label for="edit-user-role" class="block text-sm font-medium text-gray-700">Rôle</label>
-                                            <select name="edit-user-role" id="edit-user-role" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-                                                <option value="admin">Administrateur</option>
-                                                <option value="user">Utilisateur</option>
-                                            </select>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded-md">Modifier</button>
-                                            <button type="button" class="bg-red-500 text-white py-2 px-4 rounded-md" onclick="closeEditUserPopup()">Annuler</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-
-                            <!-- Popup Confirmer Suppression Utilisateur -->
-                            <div id="delete-user-popup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden">
-                                <div class="bg-white p-8 rounded-lg shadow-lg w-1/3">
-                                    <h3 class="text-2xl font-semibold mb-4">Confirmer Suppression</h3>
-                                    <p class="mb-4">Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.</p>
-                                    <div class="flex justify-between">
-                                        <button onclick="deleteUser()" class="bg-red-500 text-white py-2 px-4 rounded-md">Supprimer</button>
-                                        <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded-md" onclick="closeDeleteUserPopup()">Annuler</button>
+                        <!-- Popup Modifier Utilisateur -->
+                        <div id="edit-user-popup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden">
+                            <div class="bg-white p-8 rounded-lg shadow-lg w-1/3">
+                                <h3 class="text-2xl font-semibold mb-4">Modifier Utilisateur</h3>
+                                <form id="edit-user-form" method="POST">
+                                    <input type="hidden" name="user-id" id="edit-user-id">
+                                    <div class="mb-4">
+                                        <label for="edit-user-name" class="block text-sm font-medium text-gray-700">Nom</label>
+                                        <input type="text" name="edit-user-name" id="edit-user-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
                                     </div>
+                                    <div class="mb-4">
+                                        <label for="edit-user-email" class="block text-sm font-medium text-gray-700">Email</label>
+                                        <input type="email" name="edit-user-email" id="edit-user-email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="edit-user-role" class="block text-sm font-medium text-gray-700">Rôle</label>
+                                        <select name="edit-user-role" id="edit-user-role" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                                            <option value="admin">Administrateur</option>
+                                            <option value="user">Utilisateur</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded-md">Modifier</button>
+                                        <button type="button" class="bg-red-500 text-white py-2 px-4 rounded-md" onclick="closeEditUserPopup()">Annuler</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Popup Confirmer Suppression Utilisateur -->
+                        <div id="delete-user-popup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden">
+                            <div class="bg-white p-8 rounded-lg shadow-lg w-1/3">
+                                <h3 class="text-2xl font-semibold mb-4">Confirmer Suppression</h3>
+                                <p class="mb-4">Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.</p>
+                                <div class="flex justify-between">
+                                    <button id="delete-user-btn" onclick="deleteUser()" class="bg-red-500 text-white py-2 px-4 rounded-md">Supprimer</button>
+                                    <button type="button" class="bg-gray-500 text-white py-2 px-4 rounded-md" onclick="closeDeleteUserPopup()">Annuler</button>
                                 </div>
                             </div>
-                </section>
+                        </div>
+                    </section>
+
+                    <!-- utilisateur script -->
+                    <script>      
+                        function openEditUserPopup(userId) {
+                            // Remplir le formulaire avec les informations de l'utilisateur
+                            document.getElementById("edit-user-id").value = userId;
+                            document.getElementById("edit-user-name").value = "Nom de l'utilisateur " + userId;
+                            document.getElementById("edit-user-email").value = "user" + userId + "@example.com"; 
+                            document.getElementById("edit-user-role").value = "admin"; 
+
+                            document.getElementById("edit-user-popup").classList.remove("hidden");
+                        }
+
+                        function closeEditUserPopup() {
+                            document.getElementById("edit-user-popup").classList.add("hidden");
+                        }
+
+                        function openDeleteUserPopup(userId) {
+                            document.getElementById("delete-user-btn").setAttribute("data-user-id", userId);
+                            document.getElementById("delete-user-popup").classList.remove("hidden");
+                        }
+
+                        function closeDeleteUserPopup() {
+                            document.getElementById("delete-user-popup").classList.add("hidden");
+                        }
+
+                        function confirmDeleteUser(userId) {
+                            openDeleteUserPopup(userId);
+                            console.log("Suppression de l'utilisateur avec ID: " + userId);
+                        }
+
+                        function deleteUser() {
+                            var userId = document.getElementById("delete-user-btn").getAttribute("data-user-id");
+                            
+                            // Appeler PHP pour supprimer l'utilisateur
+                            fetch("delete_user.php", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({ id: userId }),
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert("Utilisateur supprimé.");
+                                    document.getElementById("user-" + userId).remove();
+                                    closeDeleteUserPopup();
+                                } else {
+                                    alert("Erreur lors de la suppression de l'utilisateur.");
+                                }
+                            })
+                            .catch(error => {
+                                alert("Une erreur s'est produite.");
+                                console.error(error);
+                            });
+                        }
+
+                        document.getElementById("edit-user-form").addEventListener("submit", function(event) {
+                            event.preventDefault();
+
+                            var formData = new FormData(this);
+                            var userId = formData.get("user-id");
+
+                            fetch("edit_user.php", {
+                                method: "POST",
+                                body: formData,
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert("Utilisateur modifié avec succès.");
+                                    closeEditUserPopup();
+                                    // Mettre à jour l'affichage des utilisateurs
+                                } else {
+                                    alert("Erreur lors de la modification de l'utilisateur.");
+                                }
+                            })
+                            .catch(error => {
+                                console.error("Erreur:", error);
+                                alert("Une erreur s'est produite.");
+                            });
+                        });
+
+                        document.addEventListener("DOMContentLoaded", function() {
+                            const navLinks = document.querySelectorAll("aside nav a");
+                            const sections = document.querySelectorAll(".section");
+
+                            function showSection(sectionId) {
+                                sections.forEach(function(section) {
+                                    section.classList.add("hidden");
+                                });
+
+                                const sectionToShow = document.getElementById(sectionId);
+                                if (sectionToShow) {
+                                    sectionToShow.classList.remove("hidden");
+                                }
+                            }
+
+                            navLinks.forEach(function(link) {
+                                link.addEventListener("click", function(e) {
+                                    e.preventDefault();
+                                    const sectionId = link.getAttribute("href").substring(1);
+                                    showSection(sectionId);
+                                });
+                            });
+
+                            showSection("gestion-articles");
+                        });
+                    </script>
+
+
 
     </main>
 
                 <!-- JavaScript -->
                  
-                <script>
-                    function openEditCategoryPopup(categoryId) {
-                        const category = document.querySelector(`[data-category-id="${categoryId}"]`);
-                        if (!category) {
-                            alert("Catégorie introuvable !");
-                            return;
-                        }
-
-                        document.getElementById("edit-category-id").value = categoryId;
-                        document.getElementById("edit-category-name").value = category.dataset.name;
-                        document.getElementById("edit-category-description").value = category.dataset.description;
-
-                        document.getElementById("edit-category-popup").classList.remove("hidden");
-                    }
-
-                    function closeEditCategoryPopup() {
-                        document.getElementById("edit-category-popup").classList.add("hidden");
-                        document.getElementById("edit-category-form").reset();
-                        document.getElementById("edit-message").classList.add("hidden");
-                    }
-
-                    function openAddCategoryPopup() {
-                        document.getElementById("add-category-popup").classList.remove("hidden");
-                    }
-                    function closeAddCategoryPopup() {
-                        document.getElementById("add-category-popup").classList.add("hidden");
-                    }
-
-                    
-
-
-
-                    
-                    function closeEditCategoryPopup() {
-                        document.getElementById("edit-category-popup").classList.add("hidden");
-                    }
-
-                    
-                    function deleteCategory(categoryId) {
-                                if (confirm("Êtes-vous sûr de vouloir supprimer cette catégorie ?")) {
-                                    fetch("delete_category.php", {
-                                        method: "POST",
-                                        headers: {
-                                            "Content-Type": "application/x-www-form-urlencoded",
-                                        },
-                                        body: `action=delete&id=${categoryId}`, // Indique l'action et l'ID de la catégorie
-                                    })
-                                        .then(response => {
-                                            if (!response.ok) {
-                                                return response.text().then(text => { throw new Error(text); });
-                                            }
-                                            return response.json();
-                                        })
-                                        .then(data => {
-                                            if (data.success) {
-                                                alert("Catégorie supprimée avec succès.");
-                                                document.querySelector(`[data-category-id="${categoryId}"]`).remove();
-                                            } else {
-                                                alert(data.message || "Erreur lors de la suppression de la catégorie.");
-                                            }
-                                        })
-                                        .catch(error => {
-                                            console.error("Erreur détectée:", error);
-                                            alert(`Erreur: ${error.message}`);
-                                        });
-                                }
-                            }
-
-
-                    
-                    function openEditUserPopup(userId) {
-                        document.getElementById("edit-user-name").value = "Nom de l'utilisateur " + userId;
-                        document.getElementById("edit-user-email").value = "user" + userId + "@example.com"; 
-                        document.getElementById("edit-user-role").value = "admin"; 
-
-                        document.getElementById("edit-user-popup").classList.remove("hidden");
-                    }
-
-                    function closeEditUserPopup() {
-                        document.getElementById("edit-user-popup").classList.add("hidden");
-                    }
-
-                    function openDeleteUserPopup() {
-                        document.getElementById("delete-user-popup").classList.remove("hidden");
-                    }
-
-                    function closeDeleteUserPopup() {
-                        document.getElementById("delete-user-popup").classList.add("hidden");
-                    }
-
-                    function confirmDeleteUser(userId) {
-                        openDeleteUserPopup();
-                        console.log("Suppression de l'utilisateur avec ID: " + userId);
-                    }
-
-                    function deleteUser() {
-                        alert("Utilisateur supprimé.");
-                        closeDeleteUserPopup();
-                    }
-                    document.addEventListener("DOMContentLoaded", function() {
-                        const navLinks = document.querySelectorAll("aside nav a");
-
-                        const sections = document.querySelectorAll(".section");
-
-                        function showSection(sectionId) {
-                            sections.forEach(function(section) {
-                                section.classList.add("hidden");
-                            });
-
-                            const sectionToShow = document.getElementById(sectionId);
-                            if (sectionToShow) {
-                                sectionToShow.classList.remove("hidden");
-                            }
-                        }
-
-                        navLinks.forEach(function(link) {
-                            link.addEventListener("click", function(e) {
-                                e.preventDefault();
-                                const sectionId = link.getAttribute("href").substring(1);
-                                showSection(sectionId);
-                            });
-                        });
-
-                        showSection("gestion-articles");
-                    });
-                </script>
-
+                
 </body>
 </html>

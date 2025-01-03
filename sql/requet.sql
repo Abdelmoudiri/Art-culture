@@ -1,5 +1,6 @@
 -- Active: 1733407253980@@127.0.0.1@3306@art_culture
 CREATE DATABASE art_culture;
+drop DATABASE art_culture;
 use art_culture;
 
 -- Table des utilisateurs 
@@ -15,18 +16,20 @@ CREATE TABLE User (
     is_deleted BOOLEAN DEFAULT false
 );
 
-insert into `user`(firstname,lastname,email,role,password) VALUES
+insert into User(firstname,lastname,email,role,password) VALUES
 ("abdeljabbar","moudiri","amoudiri@gmail.com","admin","moudiri"),
 ("ahmed","sari","ahmed@gmail.com","auteur","ahmed"),
 ("salma","salamat","salma@gmail.com","visiteur","salma");
 
-select * from Categorie;
+select * from User;
 -- categorie
 
 CREATE TABLE Categorie (
     id_categorie INT AUTO_INCREMENT PRIMARY KEY,
-    nom VARCHAR(50) NOT NULL
+    nom VARCHAR(50) NOT NULL,
+    description text NOT NULL
 );
+drop Table categorie;
 
 SET foreign_key_checks = 0;
 TRUNCATE TABLE Categorie;
@@ -57,6 +60,7 @@ CREATE TABLE Article (
     FOREIGN KEY (id_categorie) REFERENCES Categorie(id_categorie) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (id_auteur) REFERENCES User(id_user) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
 INSERT INTO Article (titre, content, datePublication, image, etat, id_categorie, id_auteur)
 VALUES
     ('Introduction à la Programmation', 'Cet article explore les bases de la programmation.', '2025-01-01', 'programming_intro.jpg', 'Publié', 1, 2),
@@ -67,6 +71,13 @@ VALUES
     ('Les Meilleurs Frameworks en JavaScript', 'Une analyse des frameworks JavaScript les plus populaires.', '2025-01-06', 'js_frameworks.jpg', 'Publié', 1, 2);
 
 SELECT * FROM Article WHERE etat = 'En attente';
+
+SELECT * FROM Article ;
+SELECT * FROM categorie ;
+SELECT * FROM `user` ;
+
+
+SELECT u.* FROM Article a JOIN User u on a.id_auteur=u.id_user GROUP BY u.firstname ;
 
 
 

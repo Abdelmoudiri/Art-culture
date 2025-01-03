@@ -106,13 +106,24 @@ class Admin extends User{
         }
     }
     
-
-    
-    
+    public static function getAllUtilisateur()
+    {
+        require_once __DIR__ . "/database.php";
+        
+        try {
+            $query = "SELECT * FROM User WHERE is_deleted = FALSE";
+            $stmt = $conn->prepare($requet);
+            $stmt->execute();
+            $utilisateurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if (!empty($utilisateurs)) {
+                return $utilisateurs;
+            } else {
+                return [];
+            }
+        } catch (PDOException $e) {
+            die("Erreur : " . $e->getMessage());
+        }
+    }
 }
-
-
-
-
 
 ?>
