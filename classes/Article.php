@@ -25,6 +25,12 @@ class Article
         $this->idAuteur = $idAuteur;
     }
 
+   
+    public function getIdArticle()
+{
+    return $this->idArticle;
+}
+
     public function save()
     {
         try {
@@ -68,6 +74,20 @@ class Article
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             throw new Exception("Erreur lors de la récupération des articles : " . $e->getMessage());
+        }
+    }
+
+    public static function getArticleById($id) {
+        try {
+            $pdo = DatabaseConnection::getInstance()->getConnection();
+            $sql = "SELECT * FROM Article WHERE id_article = :id";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+    
+            return $stmt->fetch(PDO::FETCH_ASSOC); // Récupère une seule ligne
+        } catch (PDOException $e) {
+            throw new Exception("Erreur lors de la récupération de l'article : " . $e->getMessage());
         }
     }
     
