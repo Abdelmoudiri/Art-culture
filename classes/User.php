@@ -1,6 +1,6 @@
 <?php
 
-// include_once 'database.php';
+include_once 'database.php';
 
 class User {
     private $nom;
@@ -62,9 +62,9 @@ class User {
     public static function login($email, $password) {
         try {
             // Use DatabaseConnection to get the PDO instance
-            $pdo = DatabaseConnection::getInstance()->getConnection();
+            $conn = DatabaseConnection::getInstance()->getConnection();
             $query = "SELECT * FROM User WHERE email = :email";
-            $stmt = $pdo->prepare($query);
+            $stmt = $conn->prepare($query);
             $stmt->bindParam(':email', $email, PDO::PARAM_STR);
             $stmt->execute();
             $user = $stmt->fetch(PDO::FETCH_ASSOC);

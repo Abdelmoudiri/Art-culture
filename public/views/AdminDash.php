@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </header>
 
                     <!-- Dashboard Cards Section -->
-                <section id="gestion-articles" class="section hidden">
+                    <section id="gestion-articles" class="section hidden">
                             <div class="bg-white p-6 rounded-lg shadow-md">
                                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Gestion des Articles</h2>
                                 <p class="text-gray-600 mb-4">Créer, modifier et gérer les articles publiés.</p>
@@ -191,54 +191,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <script>
                                     function supprimerArticle(idArticle) {
                                         if (confirm("Êtes-vous sûr de vouloir supprimer cet article ?")) {
-                                            // Créer la requête AJAX
                                             var xhr = new XMLHttpRequest();
                                             xhr.open("POST", "supprimer_article.php", true);
                                             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                                             xhr.onload = function() {
                                                 if (xhr.status == 200) {
-                                                    alert(xhr.responseText); // Afficher un message de succès ou d'erreur
-                                                    location.reload(); // Recharger la page pour afficher les articles mis à jour
+                                                    alert(xhr.responseText);
+                                                    location.reload(); 
                                                 } else {
                                                     alert("Une erreur s'est produite lors de la suppression.");
                                                 }
                                             };
-                                            xhr.send("idArticle=" + idArticle); // Envoyer l'ID de l'article à supprimer
+                                            xhr.send("idArticle=" + idArticle);
                                         }
                                     }
                                     function acceptArticle(idArticle) {
                                         if (confirm("Êtes-vous sûr de vouloir accepter cet article ?")) {
-                                            // Créer la requête AJAX pour accepter l'article
                                             var xhr = new XMLHttpRequest();
                                             xhr.open("POST", "accepter_article.php", true);
                                             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                                             xhr.onload = function() {
                                                 if (xhr.status == 200) {
-                                                    alert(xhr.responseText); // Afficher un message de succès ou d'erreur
-                                                    location.reload(); // Recharger la page pour afficher les articles mis à jour
+                                                    alert(xhr.responseText); 
+                                                    location.reload(); 
                                                 } else {
                                                     alert("Une erreur s'est produite lors de l'acceptation de l'article.");
                                                 }
                                             };
-                                            xhr.send("idArticle=" + idArticle); // Envoyer l'ID de l'article à accepter
+                                            xhr.send("idArticle=" + idArticle); 
                                         }
                                     }
 
                                     function rejectArticle(idArticle) {
                                         if (confirm("Êtes-vous sûr de vouloir refuser cet article ?")) {
-                                            // Créer la requête AJAX pour refuser l'article
+                                            
                                             var xhr = new XMLHttpRequest();
                                             xhr.open("POST", "refuser_article.php", true);
                                             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                                             xhr.onload = function() {
                                                 if (xhr.status == 200) {
-                                                    alert(xhr.responseText); // Afficher un message de succès ou d'erreur
-                                                    location.reload(); // Recharger la page pour afficher les articles mis à jour
+                                                    alert(xhr.responseText);
+                                                    location.reload(); 
                                                 } else {
                                                     alert("Une erreur s'est produite lors du refus de l'article.");
                                                 }
                                             };
-                                            xhr.send("idArticle=" + idArticle); // Envoyer l'ID de l'article à refuser
+                                            xhr.send("idArticle=" + idArticle); 
                                         }
                                     }
                             </script>
@@ -319,21 +317,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
                     <!-- cattt -->
-                    <?php
-                        $categories = Categorie::getAllCategories();
-                    ?>
+                   
                     <section id="gestion-categories" class="section hidden">
                             <div class="bg-white p-6 rounded-lg shadow-md">
                                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Gestion des Catégories</h2>
                                 <p class="text-gray-600 mb-4">Créer, modifier et gérer les catégories des articles.</p>
 
-                                <!-- Boutons Voir et Ajouter Catégorie -->
                                 <div class="flex justify-between items-center mb-6">
                                     <a href="#" class="bg-blue-500 text-white py-2 px-4 rounded-md">Voir Catégories</a>
                                     <button onclick="openAddCategoryPopup()" class="bg-green-500 text-white py-2 px-4 rounded-md">Ajouter Catégorie</button>
                                 </div>
-
-                               <!-- Liste des catégories -->
+                                <!-- lescategories -->
                                 <div class="overflow-x-auto">
                                     <table class="w-full text-left border-collapse mb-4">
                                         <thead>
@@ -345,18 +339,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </thead>
                                         <tbody>
                                             <?php 
-                                            $categories = Categorie::getAllCategories();
-                                            foreach ($categories as $category): ?>
-                                            <tr>
-                                                <td class="px-4 py-2"><?= htmlspecialchars($category['nom']); ?></td>
-                                                <td class="px-4 py-2"><?= htmlspecialchars($category['description']); ?></td>
-                                                <td class="px-4 py-2">
-                                                    <!-- Correction ici : remplacer article par category -->
-                                                    <button class="bg-yellow-500 text-white py-1 px-3 rounded-md" onclick="openEditCategoryPopup(<?= $category['id_categorie']; ?>)">Modifier</button>
-                                                    <button class="bg-red-500 text-white py-1 px-3 rounded-md" onclick="deleteCategory(<?= $category['id_categorie']; ?>)">Supprimer</button>
-                                                </td>
-                                            </tr>
-                                            <?php endforeach; ?>
+                                                $categories = Categorie::getAllCategories();
+                                                foreach ($categories as $category): ?>
+                                                
+                                                <tr data-category-id="<?= $category['id_categorie']; ?>" data-name="<?= htmlspecialchars($category['nom']); ?>" data-description="<?= htmlspecialchars($category['description']); ?>">
+
+                                                    <td class="px-4 py-2"><?= htmlspecialchars($category['nom']); ?></td>
+                                                    <td class="px-4 py-2"><?= htmlspecialchars($category['description']); ?></td>
+                                                    <td class="px-4 py-2">
+                                                        <button class="bg-yellow-500 text-white py-1 px-3 rounded-md" onclick="openEditCategoryPopup(<?= $category['id_categorie']; ?>)">Modifier</button>
+                                                        <button class="bg-red-500 text-white py-1 px-3 rounded-md" onclick="deleteCategory(<?= $category['id_categorie']; ?>)">Supprimer</button>
+                                                    </td>
+                                                </tr>
+                                                <?php endforeach; ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -427,7 +422,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </thead>
                                         <tbody>
                                             <!-- Exemple d'utilisateurs statiques -->
-                                            <tr>
+                                            <?php 
+                                            echo ' <tr>
                                                 <td class="px-4 py-2">Jean Dupont</td>
                                                 <td class="px-4 py-2">jean.dupont@example.com</td>
                                                 <td class="px-4 py-2">Administrateur</td>
@@ -435,7 +431,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <button class="bg-yellow-500 text-white py-1 px-3 rounded-md" onclick="openEditUserPopup(1)">Modifier</button>
                                                     <button class="bg-red-500 text-white py-1 px-3 rounded-md" onclick="confirmDeleteUser(1)">Supprimer</button>
                                                 </td>
-                                            </tr>
+                                            </tr>';
+                                            ?>
                                             <tr>
                                                 <td class="px-4 py-2">Marie Durand</td>
                                                 <td class="px-4 py-2">marie.durand@example.com</td>
@@ -504,108 +501,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- JavaScript -->
                 <script>
-                    // Fonction pour ouvrir la popup d'ajout de catégorie
                     function openAddCategoryPopup() {
                         document.getElementById("add-category-popup").classList.remove("hidden");
                     }
-
-                    // Fonction pour fermer la popup d'ajout de catégorie
                     function closeAddCategoryPopup() {
                         document.getElementById("add-category-popup").classList.add("hidden");
                     }
 
-                    // Fonction pour ouvrir la popup de modification de catégorie
                     function openEditCategoryPopup(categoryId) {
-                        // Remplir le formulaire de modification avec les données de la catégorie sélectionnée
-                        document.getElementById("edit-category-name").value = "Nom de la catégorie " + categoryId; // Remplacer par la donnée réelle
-                        document.getElementById("edit-category-description").value = "Description de la catégorie " + categoryId; // Remplacer par la donnée réelle
-
+                        const category = document.querySelector(`[data-category-id="${categoryId}"]`);
+                        document.getElementById("edit-category-name").value = category.dataset.name;
+                        document.getElementById("edit-category-description").value = category.dataset.description;
                         document.getElementById("edit-category-popup").classList.remove("hidden");
                     }
 
-                    // Fonction pour fermer la popup de modification de catégorie
+
+                    
                     function closeEditCategoryPopup() {
                         document.getElementById("edit-category-popup").classList.add("hidden");
                     }
 
-                    // Fonction pour supprimer une catégorie
+                    
                     function deleteCategory(categoryId) {
                         if (confirm("Êtes-vous sûr de vouloir supprimer cette catégorie ?")) {
-                            // Logique pour supprimer la catégorie
-                            alert("Catégorie " + categoryId + " supprimée.");
+                            fetch(`delete_category.php?id=${categoryId}`, { method: 'DELETE' })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        alert("Catégorie supprimée avec succès.");
+                                        location.reload();
+                                    } else {
+                                        alert("Erreur lors de la suppression de la catégorie.");
+                                    }
+                                });
                         }
                     }
-                    // Fonction pour ouvrir la popup de modification d'utilisateur
+
+                    
                     function openEditUserPopup(userId) {
-                        // Remplir le formulaire de modification avec les données de l'utilisateur sélectionné
-                        document.getElementById("edit-user-name").value = "Nom de l'utilisateur " + userId; // Remplacer par la donnée réelle
-                        document.getElementById("edit-user-email").value = "user" + userId + "@example.com"; // Remplacer par la donnée réelle
-                        document.getElementById("edit-user-role").value = "admin"; // Remplacer par la donnée réelle
+                        document.getElementById("edit-user-name").value = "Nom de l'utilisateur " + userId;
+                        document.getElementById("edit-user-email").value = "user" + userId + "@example.com"; 
+                        document.getElementById("edit-user-role").value = "admin"; 
 
                         document.getElementById("edit-user-popup").classList.remove("hidden");
                     }
 
-                    // Fonction pour fermer la popup de modification d'utilisateur
                     function closeEditUserPopup() {
                         document.getElementById("edit-user-popup").classList.add("hidden");
                     }
 
-                    // Fonction pour ouvrir la popup de confirmation de suppression d'utilisateur
                     function openDeleteUserPopup() {
                         document.getElementById("delete-user-popup").classList.remove("hidden");
                     }
 
-                    // Fonction pour fermer la popup de confirmation de suppression
                     function closeDeleteUserPopup() {
                         document.getElementById("delete-user-popup").classList.add("hidden");
                     }
 
-                    // Fonction pour confirmer la suppression d'un utilisateur
                     function confirmDeleteUser(userId) {
-                        // Ouvrir la popup de confirmation de suppression
                         openDeleteUserPopup();
-                        // Tu peux utiliser l'ID utilisateur pour identifier l'utilisateur à supprimer
                         console.log("Suppression de l'utilisateur avec ID: " + userId);
                     }
 
-                    // Fonction pour supprimer un utilisateur
                     function deleteUser() {
-                        // Logique pour supprimer l'utilisateur
                         alert("Utilisateur supprimé.");
                         closeDeleteUserPopup();
                     }
-                    // Function to show a section when clicked
                     document.addEventListener("DOMContentLoaded", function() {
-                        // Récupérer tous les liens de navigation
                         const navLinks = document.querySelectorAll("aside nav a");
 
-                        // Récupérer toutes les sections du tableau de bord
                         const sections = document.querySelectorAll(".section");
 
-                        // Fonction pour afficher une section spécifique
                         function showSection(sectionId) {
-                            // Cacher toutes les sections
                             sections.forEach(function(section) {
                                 section.classList.add("hidden");
                             });
 
-                            // Afficher la section correspondante
                             const sectionToShow = document.getElementById(sectionId);
                             if (sectionToShow) {
                                 sectionToShow.classList.remove("hidden");
                             }
                         }
 
-                        // Ajouter un événement de clic sur chaque lien de la sidebar
                         navLinks.forEach(function(link) {
                             link.addEventListener("click", function(e) {
                                 e.preventDefault();
-                                const sectionId = link.getAttribute("href").substring(1); // Récupérer l'id de la section à partir de l'attribut href
+                                const sectionId = link.getAttribute("href").substring(1);
                                 showSection(sectionId);
                             });
                         });
 
-                        // Afficher la première section par défaut (par exemple, Gestion des Articles)
                         showSection("gestion-articles");
                     });
                 </script>

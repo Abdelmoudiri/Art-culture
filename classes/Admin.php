@@ -28,6 +28,7 @@ class Admin extends User{
             echo "Erreur : " . $e->getMessage();
         }
     }
+    
     public function createCategorie($nomCategorie)
     {
         require_once __DIR__ . "/database.php";

@@ -14,7 +14,10 @@ class DatabaseConnection {
             die("Erreur de connexion : " . $e->getMessage());
         }
     }
-
+    public function __destruct()
+    {
+        $this->connection=null;
+    }
     public static function getInstance() {
         if (self::$instance === null) {
             self::$instance = new self(); 
