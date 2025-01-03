@@ -60,7 +60,7 @@ CREATE TABLE Article (
     FOREIGN KEY (id_categorie) REFERENCES Categorie(id_categorie) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (id_auteur) REFERENCES User(id_user) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
+SELECT * FROM Article WHERE id_auteur = 2;
 INSERT INTO Article (titre, content, datePublication, image, etat, id_categorie, id_auteur)
 VALUES
     ('Introduction à la Programmation', 'Cet article explore les bases de la programmation.', '2025-01-01', 'programming_intro.jpg', 'Publié', 1, 2),

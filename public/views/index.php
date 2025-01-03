@@ -1,6 +1,8 @@
 <?php
 include_once('../../classes/User.php'); 
-
+session_start();
+session_unset();
+session_destroy();
 if (isset($_GET['action'])) {
     $action = $_GET['action'];
 
@@ -21,10 +23,10 @@ if (isset($_GET['action'])) {
                         header("Location: AdminDash.php?id=" . urlencode($user["id_user"]));
                         break;
                     case 'visiteur':
-                        include_once __DIR__ . "/VisiteurDash.php";
+                        header("Location: VisiteurDash.php?id=" . urlencode($user["id_user"]));
                         break;
                     case 'auteur':
-                        include_once __DIR__ . "/AuteurDash.php";
+                        header("Location: AuteurDash.php?id=" . urlencode($user["id_user"]));
                         break;
                     default:
                         include_once __DIR__ . "/../views/Admin.php";
@@ -40,11 +42,11 @@ if (isset($_GET['action'])) {
             include_once __DIR__ . "/views/login.php";
             break;
         default:
-            include_once __DIR__ . "/views/VisiteurDashboard.php";
+            include_once __DIR__ . "/views/login.php";
             break;
     }
 } else {
-    include_once __DIR__ . "/views/VisiteurDashboard.php";
+    include_once __DIR__ . "/login.php";
 
 }
 exit; 

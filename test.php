@@ -23,7 +23,8 @@ include './classes/Admin.php';
 
 // $articles = $auteur->getArticles();
 // var_dump($articles); 
-$utilisateurs = Admin::getAllUtilisateur();
+$admin=new Admin("admin","admin","admin","admin","admin");
+$utilisateurs =$admin->getAllUtilisateur();
 var_dump($utilisateurs);
 
 

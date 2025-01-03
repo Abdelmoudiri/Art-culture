@@ -5,6 +5,7 @@ class Categorie {
 
     public function __construct() {
         $this->pdo = DatabaseConnection::getInstance()->getConnection();
+        
     }
 
     public function addCategory($nom, $description) {

@@ -504,17 +504,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </thead>
                                         <tbody id="user-list">
                                         <?php
-                                                $utilisateurs = Admin::getAllUtilisateur();
-                                                var_dump($utilisateur);
+                                                $admin=new Admin("admin","admin","admin","admin","admin");
+                                                $utilisateurs =$admin->getAllUtilisateur();
                                                 if (!empty($utilisateurs)) {
                                                     foreach ($utilisateurs as $utilisateur) {
-                                                        echo "<tr id='user-" . $utilisateur['id'] . "'>";
+                                                        echo "<tr id='user-" . $utilisateur['id_user'] . "'>";
                                                         echo "<td class='px-4 py-2'>" . htmlspecialchars($utilisateur['firstname']) . " " . htmlspecialchars($utilisateur['lastname']) . "</td>";
                                                         echo "<td class='px-4 py-2'>" . htmlspecialchars($utilisateur['email']) . "</td>";
                                                         echo "<td class='px-4 py-2'>" . htmlspecialchars($utilisateur['role']) . "</td>";
                                                         echo "<td class='px-4 py-2'>
-                                                                <button class='bg-yellow-500 text-white py-1 px-3 rounded-md' onclick='openEditUserPopup(" . $utilisateur['id'] . ")'>Modifier</button>
-                                                                <button class='bg-red-500 text-white py-1 px-3 rounded-md' onclick='confirmDeleteUser(" . $utilisateur['id'] . ")'>Supprimer</button>
+                                                                <button class='bg-yellow-500 text-white py-1 px-3 rounded-md' onclick='openEditUserPopup(" . $utilisateur['id_user'] . ")'>Modifier</button>
+                                                                <button class='bg-red-500 text-white py-1 px-3 rounded-md' onclick='confirmDeleteUser(" . $utilisateur['id_user'] . ")'>Supprimer</button>
                                                             </td>";
                                                         echo "</tr>";
                                                     }
@@ -526,6 +526,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </table>
                             </div>
                         </div>
+                                <script>
+                                    function confirmDeleteUser(userId) {
+                                        const confirmation = confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.");
+                                        
+                                        if (confirmation) {
+                                            deleteUser(userId);
+                                        }
+                                    }
+
+                                    function deleteUser(userId) {
+                                        const xhr = new XMLHttpRequest();
+                                        xhr.open("POST", "delete_user.php", true);
+                                        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                                        xhr.onload = function () {
+                                            if (xhr.status === 200) {
+                                                const userRow = document.getElementById("user-" + userId);
+                                                userRow.remove();
+                                                alert("L'utilisateur a été supprimé avec succès.");
+                                            } else {
+                                                alert("Erreur lors de la suppression de l'utilisateur.");
+                                            }
+                                        };
+                                        xhr.send("user_id=" + userId); 
+                                    }
+                                </script>
+
 
                         <!-- Popup Modifier Utilisateur -->
                         <div id="edit-user-popup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden">

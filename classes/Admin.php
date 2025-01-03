@@ -1,33 +1,15 @@
 <?php
 
 class Admin extends User{
+    private $pdo;
 
     public function __construct($nom, $prenom, $email, $password, $role = 'Admin')
     {
         parent::__construct($nom, $prenom, $email, $password, $role);
+        $this->pdo = DatabaseConnection::getInstance()->getConnection();
     }
     
-    public function deleteMember($id_member)
-    {
-        require_once __DIR__ . "/database.php";
-        $id_m = intval($id_member);
     
-        try {
-            $query = "UPDATE User SET is_deleted = TRUE WHERE id = :id_member";
-            $stmt = $conn->prepare($query);
-            $stmt->bindParam(':id_member', $id_m, PDO::PARAM_INT);
-            $stmt->execute();
-            
-            if ($stmt->rowCount() > 0) {
-                echo "Membre supprimé avec succès.";
-            } else {
-                echo "Aucun membre trouvé avec cet ID.";
-            }
-    
-        } catch (PDOException $e) {
-            echo "Erreur : " . $e->getMessage();
-        }
-    }
     
     public function createCategorie($nomCategorie)
     {
@@ -64,12 +46,11 @@ class Admin extends User{
     public function accepterArticle($id_article)
     {
         $id = intval($id_article);
-        require_once __DIR__ . "/database.php";
+    
     
         $requet = "UPDATE Article SET status = 'accepter' WHERE id_article = :id_article";
-    
         try {
-            $stmt = $conn->prepare($requet);
+            $stmt = $this->pdo->prepare($requet);
     
             $stmt->bindParam(':id_article', $id, PDO::PARAM_INT);
             $stmt->execute();
@@ -106,13 +87,28 @@ class Admin extends User{
         }
     }
     
-    public static function getAllUtilisateur()
-    {
-        require_once __DIR__ . "/database.php";
-        
+
+
+
+    public function deleteUtilisateur($userId) {
+        require_once __DIR__ . '/database.php';
+
+        try {
+            $query = "UPDATE User SET is_deleted = TRUE WHERE id_user = :id_user";
+            $stmt = $this->pdo->prepare($query);
+            $stmt->bindParam(':id_user', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            die("Erreur : " . $e->getMessage());
+        }
+    }
+    public function getAllUtilisateur()
+    {        
         try {
             $query = "SELECT * FROM User WHERE is_deleted = FALSE";
-            $stmt = $conn->prepare($requet);
+            $stmt = $this->pdo->prepare($query);
             $stmt->execute();
             $utilisateurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
             if (!empty($utilisateurs)) {

@@ -145,5 +145,27 @@ class Article
             throw new Exception("Erreur lors de la suppression de l'article : " . $e->getMessage());
         }
     }
+    public static function getArticleById_user($id) {
+        try {
+            $pdo = DatabaseConnection::getInstance()->getConnection();
+            $sql = "SELECT * FROM Article WHERE id_auteur = :id"; 
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            if ($stmt->rowCount() > 0) {
+                $articles = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+                return $articles;
+            } else {
+                return null;
+            }
+        } catch (PDOException $e) {
+            throw new Exception("Erreur lors de la récupération des articles : " . $e->getMessage());
+        }
+    }
+    
+    
+    
+    
 
 }
