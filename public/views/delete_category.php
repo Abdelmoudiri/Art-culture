@@ -1,40 +1,29 @@
 <?php
-require_once __DIR__ . "/../../Categorie.php"; // Inclusion de la classe Categorie
+require_once __DIR__ . "/../../classes/Categorie.php";
 
-// Vérifier si un ID a été fourni
-if (isset($_POST['id_categorie']) && !empty($_POST['id_categorie'])) {
-    $id_categorie = intval($_POST['id_categorie']); // Assurez-vous que l'ID est un entier
+header('Content-Type: application/json'); 
 
-    // Initialiser l'instance de la classe Categorie
-    $categorie = new Categorie();
-
-    try {
-        // Supprimer la catégorie
-        if ($categorie->deleteCategory($id_categorie)) {
-            // Réponse en cas de succès
-            echo json_encode([
-                "success" => true,
-                "message" => "La catégorie a été supprimée avec succès.",
-            ]);
-        } else {
-            // Réponse en cas d'échec
-            echo json_encode([
-                "success" => false,
-                "message" => "Échec de la suppression de la catégorie.",
-            ]);
-        }
-    } catch (Exception $e) {
-        // Gestion des exceptions
-        echo json_encode([
-            "success" => false,
-            "message" => "Une erreur est survenue : " . $e->getMessage(),
-        ]);
+try {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        throw new Exception("Méthode HTTP non prise en charge.");
     }
-} else {
-    // Réponse si aucun ID n'a été fourni
-    echo json_encode([
-        "success" => false,
-        "message" => "ID de catégorie non fourni.",
-    ]);
+    if (empty($_POST['action']) || $_POST['action'] !== 'delete') {
+        throw new Exception("Action invalide.");
+    }
+    $categoryId = intval($_POST['id']);
+
+    if ($categoryId <= 0) {
+        throw new Exception("ID de catégorie invalide.");
+    }
+
+    $categorie = new Categorie();
+    if ($categorie->deleteCategory($categoryId)) {
+        echo json_encode(["success" => true, "message" => "Catégorie supprimée avec succès."]);
+    } else {
+        throw new Exception("Erreur lors de la suppression de la catégorie.");
+    }
+} catch (Exception $e) {
+    echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    http_response_code(400); 
 }
 ?>

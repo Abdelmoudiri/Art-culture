@@ -20,7 +20,7 @@ insert into `user`(firstname,lastname,email,role,password) VALUES
 ("ahmed","sari","ahmed@gmail.com","auteur","ahmed"),
 ("salma","salamat","salma@gmail.com","visiteur","salma");
 
-select * from User;
+select * from Categorie;
 -- categorie
 
 CREATE TABLE Categorie (
@@ -54,8 +54,8 @@ CREATE TABLE Article (
     etat VARCHAR(20) DEFAULT 'En attente',
     id_categorie INT,
     id_auteur INT,
-    FOREIGN KEY (id_categorie) REFERENCES Categorie(id_categorie),
-    FOREIGN KEY (id_auteur) REFERENCES User(id_user)
+    FOREIGN KEY (id_categorie) REFERENCES Categorie(id_categorie) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_auteur) REFERENCES User(id_user) ON DELETE CASCADE ON UPDATE CASCADE
 );
 INSERT INTO Article (titre, content, datePublication, image, etat, id_categorie, id_auteur)
 VALUES

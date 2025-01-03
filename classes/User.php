@@ -1,7 +1,5 @@
 <?php
-
-include_once 'database.php';
-
+include_once __DIR__ . "/database.php";
 class User {
     private $nom;
     private $prenom;
@@ -61,7 +59,6 @@ class User {
     // Login method
     public static function login($email, $password) {
         try {
-            // Use DatabaseConnection to get the PDO instance
             $conn = DatabaseConnection::getInstance()->getConnection();
             $query = "SELECT * FROM User WHERE email = :email";
             $stmt = $conn->prepare($query);
@@ -79,10 +76,8 @@ class User {
         }
     }
 
-    // Get user by ID
     public static function getUserById($id_user) {
         try {
-            // Use DatabaseConnection to get the PDO instance
             $pdo = DatabaseConnection::getInstance()->getConnection();
             $query = "SELECT * FROM User WHERE id_user = :id_user";
             $stmt = $pdo->prepare($query);

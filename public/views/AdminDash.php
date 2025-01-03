@@ -3,17 +3,25 @@ require_once __DIR__ . "/../../classes/User.php";
 require_once __DIR__ . "/../../classes/Categorie.php";
 require_once __DIR__ . "/../../classes/Article.php";
 
-$id_user = isset($_GET['id']) ? $_GET['id'] : null;
-
-if ($id_user) {
-    $user = User::getUserById($id_user);
-
+session_start();
+if (isset($_SESSION['user_id'])) {
+    $id_user = $_SESSION['user_id'];
+} elseif (isset($_GET['id'])) {
+    $id_user = $_GET['id'];
+    $_SESSION['user_id'] = $id_user;
 } else {
     echo "ID utilisateur non fourni.";
+    exit();
 }
+$user = User::getUserById($id_user);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nom = $_POST['category-name'];
     $description = $_POST['category-description'];
+    if (empty($nom) || empty($description)) {
+        echo "Les champs 'nom' et 'description' ne peuvent pas être vides.";
+        exit();
+    }
 
     $categorie = new Categorie(); 
 
@@ -382,7 +390,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div id="edit-category-popup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden">
                                 <div class="bg-white p-8 rounded-lg shadow-lg w-1/3">
                                     <h3 class="text-2xl font-semibold mb-4">Modifier la Catégorie</h3>
-                                    <form action="edit_category.php" method="POST">
+                                    <form id="edit-category-form" action="edit_category.php" method="POST">
+                                        <!-- Champ caché pour l'ID de la catégorie -->
+                                        <input type="hidden" name="edit-category-id" id="edit-category-id">
+
                                         <div class="mb-4">
                                             <label for="edit-category-name" class="block text-sm font-medium text-gray-700">Nom de la Catégorie</label>
                                             <input type="text" name="edit-category-name" id="edit-category-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
@@ -391,6 +402,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <label for="edit-category-description" class="block text-sm font-medium text-gray-700">Description</label>
                                             <textarea name="edit-category-description" id="edit-category-description" rows="4" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required></textarea>
                                         </div>
+                                        <div id="edit-message" class="text-red-500 text-sm mb-2 hidden"></div>
                                         <div class="flex justify-between">
                                             <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded-md">Modifier</button>
                                             <button type="button" class="bg-red-500 text-white py-2 px-4 rounded-md" onclick="closeEditCategoryPopup()">Annuler</button>
@@ -500,7 +512,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </main>
 
                 <!-- JavaScript -->
+                 
                 <script>
+                    function openEditCategoryPopup(categoryId) {
+                        const category = document.querySelector(`[data-category-id="${categoryId}"]`);
+                        if (!category) {
+                            alert("Catégorie introuvable !");
+                            return;
+                        }
+
+                        document.getElementById("edit-category-id").value = categoryId;
+                        document.getElementById("edit-category-name").value = category.dataset.name;
+                        document.getElementById("edit-category-description").value = category.dataset.description;
+
+                        document.getElementById("edit-category-popup").classList.remove("hidden");
+                    }
+
+                    function closeEditCategoryPopup() {
+                        document.getElementById("edit-category-popup").classList.add("hidden");
+                        document.getElementById("edit-category-form").reset();
+                        document.getElementById("edit-message").classList.add("hidden");
+                    }
+
                     function openAddCategoryPopup() {
                         document.getElementById("add-category-popup").classList.remove("hidden");
                     }
@@ -508,12 +541,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         document.getElementById("add-category-popup").classList.add("hidden");
                     }
 
-                    function openEditCategoryPopup(categoryId) {
-                        const category = document.querySelector(`[data-category-id="${categoryId}"]`);
-                        document.getElementById("edit-category-name").value = category.dataset.name;
-                        document.getElementById("edit-category-description").value = category.dataset.description;
-                        document.getElementById("edit-category-popup").classList.remove("hidden");
-                    }
+                    
+
 
 
                     
@@ -523,19 +552,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     
                     function deleteCategory(categoryId) {
-                        if (confirm("Êtes-vous sûr de vouloir supprimer cette catégorie ?")) {
-                            fetch(`delete_category.php?id=${categoryId}`, { method: 'DELETE' })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        alert("Catégorie supprimée avec succès.");
-                                        location.reload();
-                                    } else {
-                                        alert("Erreur lors de la suppression de la catégorie.");
-                                    }
-                                });
-                        }
-                    }
+                                if (confirm("Êtes-vous sûr de vouloir supprimer cette catégorie ?")) {
+                                    fetch("delete_category.php", {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/x-www-form-urlencoded",
+                                        },
+                                        body: `action=delete&id=${categoryId}`, // Indique l'action et l'ID de la catégorie
+                                    })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                return response.text().then(text => { throw new Error(text); });
+                                            }
+                                            return response.json();
+                                        })
+                                        .then(data => {
+                                            if (data.success) {
+                                                alert("Catégorie supprimée avec succès.");
+                                                document.querySelector(`[data-category-id="${categoryId}"]`).remove();
+                                            } else {
+                                                alert(data.message || "Erreur lors de la suppression de la catégorie.");
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error("Erreur détectée:", error);
+                                            alert(`Erreur: ${error.message}`);
+                                        });
+                                }
+                            }
+
 
                     
                     function openEditUserPopup(userId) {
