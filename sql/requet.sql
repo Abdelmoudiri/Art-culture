@@ -90,3 +90,174 @@ SELECT u.* FROM Article a JOIN User u on a.id_auteur=u.id_user GROUP BY u.firstn
 
 
 
+
+
+
+-- -------------------------------------------------------------------------------------
+
+SELECT 
+    categorie.nom AS categorie, 
+    COUNT(article.id_article) AS total_article
+FROM 
+    categorie
+LEFT JOIN 
+    article 
+ON 
+    categorie.id_categorie = article.id_categorie
+GROUP BY 
+    categorie.nom;
+
+-- -----------------
+SELECT 
+    auteurs.nom AS auteur, 
+    COUNT(article.id) AS total_article
+FROM 
+    auteurs
+LEFT JOIN 
+    article 
+ON 
+    auteurs.id = article.auteur_id
+GROUP BY 
+    auteurs.nom
+ORDER BY 
+    total_article DESC;
+
+----------------------------------
+SELECT 
+    categorie.nom AS categorie, 
+    AVG(COALESCE(article_count, 0)) AS moyenne_article
+FROM 
+    categorie
+LEFT JOIN (
+    SELECT 
+        categorie_id, 
+        COUNT(*) AS article_count
+    FROM 
+        article
+    GROUP BY 
+        categorie_id
+) AS article_counts 
+ON 
+    categorie.id = article_counts.categorie_id
+GROUP BY 
+    categorie.nom;
+
+----------------------------------------------
+CREATE VIEW derniers_article AS
+SELECT 
+    article.titre, 
+    article.date_publication, 
+    categorie.nom AS categorie, 
+    auteurs.nom AS auteur
+FROM 
+    article
+INNER JOIN 
+    categorie 
+ON 
+    article.categorie_id = categorie.id
+INNER JOIN 
+    auteurs 
+ON 
+    article.auteur_id = auteurs.id
+WHERE 
+    article.date_publication >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY);
+
+-----------------------------------------------
+SELECT 
+    categorie.nom AS categorie
+FROM 
+    categorie
+LEFT JOIN 
+    article 
+ON 
+    categorie.id = article.categorie_id
+WHERE 
+    article.id IS NULL;
+
+
+
+
+-- ,,,,,,,,,,,,,,,,,,,,,,,
+SELECT 
+    c.nom AS categorie, 
+    COUNT(a.id_article) AS total_articles
+FROM 
+    Categorie c
+LEFT JOIN 
+    Article a 
+ON 
+    c.id_categorie = a.id_categorie
+GROUP BY 
+    c.nom;
+
+-- 2
+SELECT 
+    u.firstname AS auteur, 
+    COUNT(a.id_article) AS total_articles
+FROM 
+    User u
+LEFT JOIN 
+    Article a 
+ON 
+    u.id_user = a.id_auteur
+WHERE 
+    u.role = 'auteur'
+GROUP BY 
+    u.firstname
+ORDER BY 
+    total_articles DESC;
+
+-- 3
+SELECT 
+    c.nom AS categorie, 
+    COALESCE(AVG(article_counts.total_articles), 0) AS moyenne_articles
+FROM 
+    Categorie c
+LEFT JOIN (
+    SELECT 
+        id_categorie, 
+        COUNT(*) AS total_articles
+    FROM 
+        Article
+    GROUP BY 
+        id_categorie
+) AS article_counts 
+ON 
+    c.id_categorie = article_counts.id_categorie
+GROUP BY 
+    c.nom;
+
+-- 4
+CREATE VIEW derniers_articles AS
+SELECT 
+    a.titre, 
+    a.datePublication AS date_publication, 
+    c.nom AS categorie, 
+    u.firstname AS auteur
+FROM 
+    Article a
+INNER JOIN 
+    Categorie c 
+ON 
+    a.id_categorie = c.id_categorie
+INNER JOIN 
+    User u 
+ON 
+    a.id_auteur = u.id_user
+WHERE 
+    a.datePublication >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY);
+
+SELECT * FROM derniers_articles;
+
+
+-- 5
+SELECT 
+    c.nom AS categorie
+FROM 
+    Categorie c
+LEFT JOIN 
+    Article a 
+ON 
+    c.id_categorie = a.id_categorie
+WHERE 
+    a.id_article IS NULL;

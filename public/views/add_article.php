@@ -15,7 +15,7 @@ try {
         $input['titre'],
         $input['content'],
         $input['datePublication'],
-        $input['image'] ?? null,
+        $input['image'] ?? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlSjpT0YPXyFzHpBKIPoedcq1J-G-9c25Jxw&s",
         "En attente",
         $input['idCategorie'],
         $input['idAuteur']

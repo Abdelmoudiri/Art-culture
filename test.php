@@ -2,6 +2,7 @@
 
 include './classes/User.php';
 include './classes/Admin.php';
+include './classes/Article.php';
 
 
 // $pass = password_hash("ahmed",PASSWORD_BCRYPT);
@@ -23,9 +24,10 @@ include './classes/Admin.php';
 
 // $articles = $auteur->getArticles();
 // var_dump($articles); 
-$admin=new Admin("admin","admin","admin","admin","admin");
-$utilisateurs =$admin->getAllUtilisateur();
-var_dump($utilisateurs);
+// $admin=new Admin("admin","admin","admin","admin","admin");
+// $utilisateurs =$admin->getAllUtilisateur();
+// var_dump($utilisateurs);
 
+Article::delete(11);
 
 ?>

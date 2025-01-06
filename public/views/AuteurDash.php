@@ -168,10 +168,8 @@ try {
                             </select>
                             <button onclick="addArticle()" class="text-white bg-green-600 hover:bg-green-700 py-2 px-4 rounded-lg">Ajouter</button>
                         </div>
-
-
                         <script>
-                                const userId = <?php echo $id_user; ?>; // Passez la valeur PHP à une variable JavaScript
+                                const userId = <?php echo $id_user; ?>; 
                                 function addArticle() {
                                     const title = document.getElementById('articleTitle').value.trim();
                                     const content = document.getElementById('articleContent').value.trim();
@@ -187,7 +185,7 @@ try {
                                         content: content,
                                         datePublication: new Date().toISOString().slice(0, 19).replace('T', ' '), // Format SQL
                                         idCategorie: category,
-                                        idAuteur: userId,  // Utilisation de la variable définie plus haut
+                                        idAuteur: userId, 
                                     };
 
                                     fetch('add_article.php', {
@@ -213,7 +211,7 @@ try {
                                         alert('Une erreur s\'est produite.');
                                     });
                                 }
-                            </script>
+                        </script>
 
 
                             <!-- Sections cachées qui seront affichées au clic -->
@@ -241,83 +239,144 @@ try {
                             <div id="supprimerSection" class="section-content hidden p-6 mt-8 bg-white rounded-lg shadow-md">
                                 <h3 class="text-2xl font-semibold text-gray-800 mb-4">Supprimer un Article</h3>
                                 <p class="text-gray-600 mb-4">Choisissez un article à supprimer.</p>
-                                
-                                <form method="POST" action="delete_article.php">
-                                    <select name="idArticle" class="border border-gray-300 text-black p-2 w-full mb-4 rounded-md" required>
+
+                                <form id="deleteForm" method="POST">
+                                    <select name="idArticle" id="idArticle" class="border border-gray-300 text-black p-2 w-full mb-4 rounded-md" required>
                                         <option value="" disabled selected>Sélectionner un article à supprimer</option>
-                                        <?php foreach ($articles as $article): ?>
-                                            <option value="<?php echo htmlspecialchars($article['id_article']); ?>">
-                                                <?php echo htmlspecialchars($article['titre']); ?>
-                                            </option>
-                                        <?php endforeach; ?>
+                                        <?php 
+                                        if (isset($articles) && is_array($articles)) {
+                                            foreach ($articles as $article): ?>
+                                                <option value="<?php echo htmlspecialchars($article['id_article']); ?>">
+                                                    <?php echo htmlspecialchars($article['titre']); ?>
+                                                </option>
+                                            <?php endforeach; 
+                                        } else {
+                                            echo "<option disabled>Aucun article disponible</option>";
+                                        }
+                                        ?>
                                     </select>
-                                    
-                                    <button type="submit" class="text-white bg-red-600 hover:bg-red-700 py-2 px-4 rounded-lg w-full">Supprimer</button>
+                                    <button type="submit" id="deleteButton" class="text-white bg-red-600 hover:bg-red-700 py-2 px-4 rounded-lg w-full">Supprimer</button>
                                 </form>
+                                <div id="message" class="mt-4"></div> <!-- Message d'erreur ou de confirmation -->
                             </div>
+
+                            <script>
+                                document.getElementById('deleteForm').addEventListener('submit', function(e) {
+                                    e.preventDefault(); // Empêche l'envoi traditionnel du formulaire
+
+                                    // Récupérer l'ID de l'article sélectionné
+                                    const idArticle = document.getElementById('idArticle').value;
+
+                                    // Vérifier si un article a été sélectionné
+                                    if (!idArticle) {
+                                        document.getElementById('message').innerHTML = '<p class="text-red-600">Veuillez sélectionner un article à supprimer.</p>';
+                                        return;
+                                    }
+
+                                    // Créer une requête AJAX
+                                    const xhr = new XMLHttpRequest();
+                                    xhr.open('POST', 'delete_article.php', true);
+                                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+
+
+
+
+                                    xhr.onload = function() {
+                                        if (xhr.status === 200) {
+                                            const messageElement = document.getElementById('message');
+                                            if (xhr.responseText === 'success') {
+                                                messageElement.innerHTML = '<p class="text-green-600">L\'article a été supprimé avec succès.</p>';
+                                                // Retirer l'article supprimé de la liste déroulante
+                                                document.querySelector(`option[value="${idArticle}"]`).remove();
+                                            } else {
+                                                messageElement.innerHTML = '<p class="text-red-600">Une erreur est survenue lors de la suppression de l\'article.</p>';
+                                            }
+                                        } else {
+                                            document.getElementById('message').innerHTML = '<p class="text-red-600">Une erreur est survenue lors de la suppression de l\'article.</p>';
+                                        }
+                                    };
+
+                                    // Lorsque la requête est terminée, traiter la réponse
+                                   
+
+                                    xhr.send('idArticle=' + encodeURIComponent(idArticle));
+                                });
+                            </script>
+
+
 
 
                         
                     </div>
 
-<script>
-    // Fonction pour afficher la section appropriée
-    function showSection(sectionId) {
-        // Masquer toutes les sections
-        const sections = document.querySelectorAll('.section-content');
-        sections.forEach(function(section) {
-            section.classList.add('hidden');
-        });
+                        <script>
+                            // Fonction pour afficher la section appropriée
+                            function showSection(sectionId) {
+                                // Masquer toutes les sections
+                                const sections = document.querySelectorAll('.section-content');
+                                sections.forEach(function(section) {
+                                    section.classList.add('hidden');
+                                });
 
-        // Afficher la section demandée
-        const sectionToShow = document.getElementById(sectionId);
-        sectionToShow.classList.remove('hidden');
-    }
-</script>
-<div class="max-w-screen-xl mx-auto p-10">
-    <?php if ($articles && is_array($articles)): ?>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            <?php foreach ($articles as $art): ?>
-                <div class="card bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-transform duration-300">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3"><?php echo htmlspecialchars($art["titre"]); ?></h3>
-                    <div class="text-sm text-gray-500 mb-4">
-                        <p>Par Auteur | <?php echo date("d M Y", strtotime($art['datePublication'])); ?></p>
-                    </div>
-                    <p class="text-gray-700 mb-4 line-clamp-4"><?php echo htmlspecialchars(substr($art['content'], 0, 10)) . '...'; ?></p>
-                    <button 
-                        class="inline-block text-teal-500 font-semibold hover:text-teal-600 hover:underline"
-                        onclick="showPopup(<?php echo htmlspecialchars(json_encode($art)); ?>)">
-                        Lire l'article
-                    </button>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    <?php else: ?>
-        <p class="text-center text-gray-500">Aucun article trouvé pour cet auteur.</p>
-    <?php endif; ?>
-</div>
+                                // Afficher la section demandée
+                                const sectionToShow = document.getElementById(sectionId);
+                                sectionToShow.classList.remove('hidden');
+                            }
+                        </script>
 
-<div id="articleModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
-    <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full relative">
-        <button class="absolute top-3 right-3 text-gray-600 hover:text-gray-800" onclick="closePopup()">✖</button>
-        <h3 id="modalTitle" class="text-2xl font-bold text-gray-800 mb-4"></h3>
-        <div id="modalMeta" class="text-sm text-gray-500 mb-4"></div>
-        <p id="modalContent" class="text-gray-700 leading-relaxed"></p>
-    </div>
-</div>
+                        <div class="max-w-screen-xl mx-auto p-10">
+                            <?php if ($articles && is_array($articles)): ?>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                                    <?php foreach ($articles as $art): ?>
+                                        <div class="card bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-transform duration-300">
+                                            <!-- Ajouter l'image -->
+                                            <?php if (!empty($art['image'])): ?>
+                                                <img src="<?php echo htmlspecialchars($art['image']); ?>" alt="Image de l'article" class="w-full h-48 object-cover rounded-t-lg mb-4">
+                                            <?php else: ?>
+                                                <img src="default-image.jpg" alt="Image par défaut" class="w-full h-48 object-cover rounded-t-lg mb-4">
+                                            <?php endif; ?>
 
-<script>
-    function showPopup(article) {
-        document.getElementById('modalTitle').innerText = article.titre;
-        document.getElementById('modalMeta').innerText = `Par Auteur | ${new Date(article.datePublication).toLocaleDateString()}`;
-        document.getElementById('modalContent').innerText = article.content;
-        document.getElementById('articleModal').classList.remove('hidden');
-    }
+                                            <h3 class="text-xl font-semibold text-gray-800 mb-3"><?php echo htmlspecialchars($art["titre"]); ?></h3>
+                                            <div class="text-sm text-gray-500 mb-4">
+                                                <p>Par Auteur | <?php echo date("d M Y", strtotime($art['datePublication'])); ?></p>
+                                            </div>
+                                            <p class="text-gray-700 mb-4 line-clamp-4"><?php echo htmlspecialchars(substr($art['content'], 0, 10)) . '...'; ?></p>
+                                            <button 
+                                                class="inline-block text-teal-500 font-semibold hover:text-teal-600 hover:underline"
+                                                onclick="showPopup(<?php echo htmlspecialchars(json_encode($art)); ?>)">
+                                                Lire l'article
+                                            </button>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php else: ?>
+                                <p class="text-center text-gray-500">Aucun article trouvé pour cet auteur.</p>
+                            <?php endif; ?>
+                        </div>
 
-    function closePopup() {
-        document.getElementById('articleModal').classList.add('hidden');
-    }
-</script>
+
+                        <div id="articleModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+                            <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full relative">
+                                <button class="absolute top-3 right-3 text-gray-600 hover:text-gray-800" onclick="closePopup()">✖</button>
+                                <h3 id="modalTitle" class="text-2xl font-bold text-gray-800 mb-4"></h3>
+                                <div id="modalMeta" class="text-sm text-gray-500 mb-4"></div>
+                                <p id="modalContent" class="text-gray-700 leading-relaxed"></p>
+                            </div>
+                        </div>
+
+                        <script>
+                            function showPopup(article) {
+                                document.getElementById('modalTitle').innerText = article.titre;
+                                document.getElementById('modalMeta').innerText = `Par Auteur | ${new Date(article.datePublication).toLocaleDateString()}`;
+                                document.getElementById('modalContent').innerText = article.content;
+                                document.getElementById('articleModal').classList.remove('hidden');
+                            }
+
+                            function closePopup() {
+                                document.getElementById('articleModal').classList.add('hidden');
+                            }
+                        </script>
 
 
 

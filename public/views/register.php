@@ -67,6 +67,16 @@
                                 <div id="errorCPassword" class="text-red-500 text-xs mt-1"></div>
                             </div>
                         </div>
+                        <div class="mb-4">
+    <label class="block mb-2 text-sm font-bold text-gray-700" for="profilePicture">
+        Profile Picture
+    </label>
+    <input
+        class="w-full px-3 py-2 text-sm leading-tight text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-cyan-500"
+        id="profilePicture" type="file" accept="image/*" />
+    <div id="errorProfilePicture" class="text-red-500 text-xs mt-1"></div>
+</div>
+
                         <div class="relative">
                 <select id="countries" class="bg-gray-50 border border-gray-300 my-3 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block mx-auto p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                     <option selected>Choose yor Role</option>

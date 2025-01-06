@@ -154,17 +154,27 @@ class Article
     }
 }
 
-    public static function delete($idArticle)
-    {
-        try {
-            $pdo = DatabaseConnection::getInstance()->getConnection();
-            $sql = "DELETE FROM Article WHERE id_article = :idArticle";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([':idArticle' => $idArticle]);
-        } catch (PDOException $e) {
-            throw new Exception("Erreur lors de la suppression de l'article : " . $e->getMessage());
+public static function delete(int $idArticle)
+{
+    try {
+        $pdo = DatabaseConnection::getInstance()->getConnection();
+        $sql = "DELETE FROM Article WHERE id_article = :idArticle";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([':idArticle' => $idArticle]);
+        
+        if ($stmt->rowCount() > 0) {
+            return true;
+        } else {
+            throw new Exception('Aucun article trouvé avec cet ID.');
         }
+    } catch (PDOException $e) {
+        throw new Exception("Erreur de la base de données : " . $e->getMessage());
+    } catch (Exception $e) {
+        throw new Exception("Erreur lors de la suppression de l'article :hh " . $e->getMessage());
     }
+}
+
+
     public static function getArticleById_user($id) {
         try {
             $pdo = DatabaseConnection::getInstance()->getConnection();
