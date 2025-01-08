@@ -1,3 +1,21 @@
+<?php
+include_once('../../classes/Article.php'); 
+include_once('../../classes/Categorie.php'); 
+
+$categories =Categorie::getAllCategories();
+
+$articles = Article::getAll();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = htmlspecialchars($_POST['name']);
+    $email = htmlspecialchars($_POST['email']);
+    $message = htmlspecialchars($_POST['message']);
+    $confirmation = "Merci, $name ! Votre message a été envoyé.";
+}
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,31 +26,6 @@
 </head>
 <body class="bg-gray-900 text-white">
 
-<?php
-// Simuler des données dynamiques
-$categories = [
-    ["name" => "Peinture", "image" => "https://images.unsplash.com/photo-1533757740036-7e0fa1d88f6b"],
-    ["name" => "Musique", "image" => "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4"],
-    ["name" => "Littérature", "image" => "https://images.unsplash.com/photo-1512820790803-83ca734da794"],
-    ["name" => "Cinéma", "image" => "https://images.unsplash.com/photo-1498050108023-c5249f4df085"],
-];
-
-$articles = [
-    ["title" => "Les Secrets de la Peinture Renaissance", "date" => "12 Décembre 2023", "category" => "Peinture", "image" => "https://images.unsplash.com/photo-1533757740036-7e0fa1d88f6b", "excerpt" => "Découvrez les techniques fascinantes derrière les chefs-d'œuvre de la Renaissance."],
-    ["title" => "L'Évolution de la Musique Classique", "date" => "10 Décembre 2023", "category" => "Musique", "image" => "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4", "excerpt" => "Un voyage à travers les époques musicales, de Mozart à Beethoven."],
-    ["title" => "Les Livres qui Ont Changé le Monde", "date" => "15 Décembre 2023", "category" => "Littérature", "image" => "https://images.unsplash.com/photo-1512820790803-83ca734da794", "excerpt" => "Explorez les œuvres littéraires qui ont influencé des générations entières."],
-    ["title" => "L'Art Moderne dans le Cinéma", "date" => "20 Décembre 2023", "category" => "Cinéma", "image" => "https://images.unsplash.com/photo-1498050108023-c5249f4df085", "excerpt" => "Comment le cinéma contemporain s'inspire des formes d'art modernes."],
-];
-
-// Traitement du formulaire
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = htmlspecialchars($_POST['name']);
-    $email = htmlspecialchars($_POST['email']);
-    $message = htmlspecialchars($_POST['message']);
-    // Ajoutez une logique pour stocker les messages dans une base de données ou les envoyer par email
-    $confirmation = "Merci, $name ! Votre message a été envoyé.";
-}
-?>
 
 <!-- Navbar -->
 <header class="bg-gray-800 shadow-md">
@@ -56,21 +49,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </section>
 
-<!-- Categories Section -->
+<!-- Bare de filtrage -->
 <section id="categories" class="container mx-auto py-12 px-6">
     <h3 class="text-3xl font-bold mb-8 text-center">Explorez par Catégories</h3>
-    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="flex gap-6 justify-center mb-8">
         <?php foreach ($categories as $category): ?>
+            <a href="?categorie=<?= $category['id_categorie'] ?>" class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-full">
+                <?= $category['nom'] ?>
+            </a>
+        <?php endforeach; ?>
+    </div>
+</section>
+
+<section id="articles" class="container mx-auto py-12 px-6">
+    <h3 class="text-3xl font-bold mb-8 text-center">
+        <?php if ($categorie_id): ?>
+            Articles de la catégorie : <?= htmlspecialchars($categories[array_search($categorie_id, array_column($categories, 'id_categorie'))]['nom']); ?>
+        <?php else: ?>
+            Derniers Articles
+        <?php endif; ?>
+    </h3>
+    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <?php foreach ($articles as $article): ?>
             <div class="bg-white text-gray-800 rounded-lg shadow-md overflow-hidden">
-                <img src="<?= $category['image'] ?>" alt="<?= $category['name'] ?>" class="w-full h-48 object-cover">
-                <div class="p-6 text-center">
-                    <h4 class="text-xl font-bold mb-4"><?= $category['name'] ?></h4>
-                    <a href="#" class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded">Voir Articles</a>
+                <img src="<?= htmlspecialchars($article['image']) ?>" 
+                     alt="<?= htmlspecialchars($article['titre']) ?>" 
+                     class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <p class="text-sm text-purple-600 uppercase">
+                        <?= date('d M Y', strtotime($article['datePublication'])) ?> - <?= htmlspecialchars($article['nom_categorie']) ?>
+                    </p>
+                    <h4 class="text-xl font-bold mb-4"><?= htmlspecialchars($article['titre']) ?></h4>
+                    <p class="text-gray-700 mb-4"><?= htmlspecialchars(mb_substr($article['content'], 0, 100)) ?>...</p>
+                    <a href="article_detail.php?id=<?= $article['id_article'] ?>" class="text-purple-600 font-medium hover:underline">Lire plus</a>
                 </div>
             </div>
         <?php endforeach; ?>
     </div>
 </section>
+
 
 <!-- Articles Section -->
 <section id="articles" class="container mx-auto py-12 px-6">
@@ -78,17 +95,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         <?php foreach ($articles as $article): ?>
             <div class="bg-white text-gray-800 rounded-lg shadow-md overflow-hidden">
-                <img src="<?= $article['image'] ?>" alt="<?= $article['title'] ?>" class="w-full h-48 object-cover">
+                <img src="<?= htmlspecialchars($article['image']) ?>" 
+                     alt="<?= htmlspecialchars($article['titre']) ?>" 
+                     class="w-full h-48 object-cover">
                 <div class="p-6">
-                    <p class="text-sm text-purple-600 uppercase"><?= $article['date'] ?> - <?= $article['category'] ?></p>
-                    <h4 class="text-xl font-bold mb-4"><?= $article['title'] ?></h4>
-                    <p class="text-gray-700 mb-4"><?= $article['excerpt'] ?></p>
+                    <p class="text-sm text-purple-600 uppercase">
+                        <?= date('d M Y', strtotime($article['datePublication'])) ?> - <?= htmlspecialchars($article['nom_categorie']) ?>
+                    </p>
+                    <h4 class="text-xl font-bold mb-4"><?= htmlspecialchars($article['titre']) ?></h4>
+                    <p class="text-gray-700 mb-4"><?= htmlspecialchars(mb_substr($article['content'], 0, 100)) ?>...</p>
                     <a href="#" class="text-purple-600 font-medium hover:underline">Lire plus</a>
                 </div>
             </div>
         <?php endforeach; ?>
     </div>
 </section>
+
 
 <!-- Contact Section -->
 <section class="bg-gradient-to-r from-green-400 to-blue-500 py-12 text-white">

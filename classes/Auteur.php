@@ -1,7 +1,8 @@
 <?php
 include_once __DIR__ . "/User.php";
+include_once __DIR__ . "/Visiteur.php";
 
-class Auteur extends User {
+class Auteur extends Visiteur {
 
     public function __construct($nom, $prenom, $email, $password, $role) {
         parent::__construct($nom, $prenom, $email, $password, $role);

@@ -15,6 +15,8 @@ CREATE TABLE User (
     date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted BOOLEAN DEFAULT false
 );
+DELETE FROM `user` WHERE id_user = 4;
+
 
 insert into User(firstname,lastname,email,role,password) VALUES
 ("abdeljabbar","moudiri","amoudiri@gmail.com","admin","moudiri"),
@@ -28,6 +30,22 @@ CREATE TABLE Categorie (
     id_categorie INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(50) NOT NULL,
     description text NOT NULL
+);
+CREATE TABLE Article (
+    id_article INT AUTO_INCREMENT PRIMARY KEY,
+    titre VARCHAR(100) NOT NULL,
+    content TEXT NOT NULL,
+    datePublication DATETIME DEFAULT CURRENT_TIMESTAMP,
+    image VARCHAR(255) DEFAULT 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlSjpT0YPXyFzHpBKIPoedcq1J-G-9c25Jxw&s',
+    etat VARCHAR(20) DEFAULT 'En attente',
+    id_categorie INT,
+    id_auteur INT,
+    FOREIGN KEY (id_categorie) REFERENCES Categorie(id_categorie)
+        ON DELETE CASCADE 
+        ON UPDATE CASCADE,
+    FOREIGN KEY (id_auteur) REFERENCES User(id_user)
+        ON DELETE CASCADE 
+        ON UPDATE CASCADE
 );
 drop Table categorie;
 
@@ -65,7 +83,7 @@ CREATE TABLE Article (
         ON UPDATE CASCADE
 );
 
-SELECT * FROM Article WHERE id_auteur = 2;
+SELECT * FROM categorie;
 INSERT INTO Article (titre, content, id_categorie, id_auteur) 
 VALUES 
     ('Article 1', 'Contenu de l\'article 1 : Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet quam ut lorem laoreet fermentum a in erat. Integer auctor sem ut velit tincidunt, vitae cursus neque tincidunt. Sed lacinia lectus vitae magna convallis, vel tincidunt lorem fringilla. Fusce tempus tortor ut leo accumsan, nec facilisis nulla volutpat. Nullam cursus lectus felis, et tristique felis posuere vel. Suspendisse potenti. Curabitur viverra ipsum quis nisi malesuada pharetra.', 1, 2),
@@ -261,3 +279,36 @@ ON
     c.id_categorie = a.id_categorie
 WHERE 
     a.id_article IS NULL;
+
+
+
+-- le nouveaux tables
+
+CREATE TABLE tags (
+    id_tag INT PRIMARY KEY,
+    nom_tag VARCHAR(15) NOT NULL
+);
+CREATE TABLE Article_tags (
+     id_tag INT,
+    id_article INT,
+    PRIMARY KEY (id_tag, id_article), 
+    FOREIGN KEY (id_tag) REFERENCES tags(id_tag) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_article) REFERENCES Article(id_article) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE commentaires (
+    id_commentaire INT PRIMARY KEY,
+    contenu VARCHAR(100) NOT NULL,
+    id_visiteur INT,
+    id_article INT,
+    FOREIGN KEY (id_visiteur) REFERENCES User(id_user) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_article) REFERENCES Article(id_article) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE favoris (
+    id_visiteur INT,
+    id_article INT,
+    PRIMARY KEY (id_visiteur, id_article), 
+    FOREIGN KEY (id_visiteur) REFERENCES User(id_user) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_article) REFERENCES Article(id_article) ON DELETE CASCADE ON UPDATE CASCADE
+);

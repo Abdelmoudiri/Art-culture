@@ -1,58 +1,19 @@
 <?php
+
 include_once __DIR__ . "/database.php";
 class User {
-    private $nom;
-    private $prenom;
-    private $email;
-    private $password;
-    private $role;
+    protected $nom;
+    protected $prenom;
+    protected $email;
+    protected $password;
+    protected $role;
+    
 
     public function __construct($nom, $prenom, $email, $password, $role) {
         $this->nom = $nom;
         $this->prenom = $prenom;
         $this->email = $email;
         $this->password = $password;
-        $this->role = $role;
-    }
-
-    // Setters & getters
-    public function getNom() {
-        return $this->nom;
-    }
-
-    public function getPrenom() {
-        return $this->prenom;
-    }
-
-    public function getEmail() {
-        return $this->email;
-    }
-
-    public function getPassword() {
-        return $this->password;
-    }
-
-    public function getRole() {
-        return $this->role;
-    }
-
-    public function setNom($nom) {
-        $this->nom = $nom;
-    }
-
-    public function setPrenom($prenom) {
-        $this->prenom = $prenom;
-    }
-
-    public function setEmail($email) {
-        $this->email = $email;
-    }
-
-    public function setPassword($password) {
-        $this->password = $password;
-    }
-
-    public function setRole($role) {
         $this->role = $role;
     }
 

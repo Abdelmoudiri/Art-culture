@@ -87,7 +87,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="bg-gray-100">
 
     <!-- Sidebar -->
-    <!-- Sidebar -->
     <aside class="w-64 h-screen bg-gray-800 text-white p-6 fixed">
         <h2 class="text-2xl font-bold text-center mb-8">Admin Dashboard</h2>
         <nav class="space-y-6">
@@ -130,8 +129,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <span>Logout</span>
         </a>
     </aside>
-
-
 
     <script>
         function setActiveSection(linkId) {
@@ -265,10 +262,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div id="add-article-popup" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden">
             <div class="bg-white p-8 rounded-lg shadow-lg w-1/3">
                 <h3 class="text-2xl font-semibold mb-4">Ajouter un Nouvel Article</h3>
-
-                <!-- Section des articles en attente -->
                 <h4 class="text-xl font-semibold mb-4">Articles en Attente</h4>
-                <div class="overflow-y-auto max-h-[300px]"> <!-- Limite la hauteur à 500px avec défilement -->
+                <div class="overflow-y-auto max-h-[300px]">
                     <table class="w-full text-left border-collapse mb-4">
                         <thead>
                             <tr>
@@ -298,7 +293,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </tbody>
                     </table>
                 </div>
-
 
                 <div class="flex justify-between mt-4">
                     <button type="button" class="bg-red-500 text-white py-2 px-4 rounded-md" onclick="closeAddArticlePopup()">Annuler</button>
@@ -337,7 +331,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="#" class="bg-blue-500 text-white py-2 px-4 rounded-md">Voir Catégories</a>
                     <button onclick="openAddCategoryPopup()" class="bg-green-500 text-white py-2 px-4 rounded-md">Ajouter Catégorie</button>
                 </div>
-                <!-- lescategories -->
+                <!-- les categories -->
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse mb-4">
                         <thead>
@@ -461,7 +455,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             headers: {
                                 "Content-Type": "application/x-www-form-urlencoded",
                             },
-                            body: `action=delete&id=${categoryId}`, // Indique l'action et l'ID de la catégorie
+                            body: `action=delete&id=${categoryId}`,
                         })
                         .then(response => {
                             if (!response.ok) {
@@ -530,7 +524,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <script>
                 function confirmDeleteUser(userId) {
                     const confirmation = confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.");
-
                     if (confirmation) {
                         deleteUser(userId);
                     }
@@ -595,12 +588,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
         </section>
-       <section id="gestion-tags" class="hidden">
-        <h1>Tags</h1>
-       </section>
-       <section id="gestion-commentaires" class="hidden">
-        <h1>comment</h1>
-       </section>
+        <section id="gestion-tags" class="hidden">
+            <h1>Tags</h1>
+            <div class="p-2 my-4 max-w-md">
+                <h2 class="mb-4 text-lg border-l-2 pl-2 rounded border-green-800">Popular tags</h2>
+                <div class="flex flex-wrap gap-2" id="tag-list">
+                    <!-- Exemple de tag avec bouton de suppression -->
+                    <div class="flex items-center gap-1 px-2 py-1 text-sm bg-green-100/80 rounded-lg">
+                        PHP Programming
+                        <button class="text-red-600 hover:text-red-800" onclick="removeTag(this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-1 px-2 py-1 text-sm bg-green-100/80 rounded-lg">
+                        PHP
+                        <button class="text-red-600 hover:text-red-800" onclick="removeTag(this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <!-- Input pour ajouter un nouveau tag -->
+                <div class="mt-4">
+                    <input
+                        id="new-tag-input"
+                        type="text"
+                        class="border border-gray-300 rounded p-2 w-full"
+                        placeholder="Add a new tag..." />
+                    <button
+                        onclick="addTag()"
+                        class="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-800">
+                        Add Tag
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <script>
+            function addTag() {
+                const input = document.getElementById("new-tag-input");
+                const tagList = document.getElementById("tag-list");
+
+                // Vérifie si l'input n'est pas vide
+                if (input.value.trim() !== "") {
+                    const tagDiv = document.createElement("div");
+                    tagDiv.className = "flex items-center gap-1 px-2 py-1 text-sm bg-green-100/80 rounded-lg";
+
+                    // Texte du tag
+                    const tagText = document.createTextNode(input.value.trim());
+                    tagDiv.appendChild(tagText);
+
+                    // Bouton de suppression
+                    const removeButton = document.createElement("button");
+                    removeButton.className = "text-red-600 hover:text-red-800";
+                    removeButton.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            `;
+                    removeButton.onclick = function() {
+                        removeTag(removeButton);
+                    };
+                    tagDiv.appendChild(removeButton);
+
+                    // Ajoute le nouveau tag à la liste
+                    tagList.appendChild(tagDiv);
+                    input.value = ""; // Réinitialise l'input
+                }
+            }
+
+            function removeTag(button) {
+                const tag = button.parentElement;
+                tag.remove();
+            }
+        </script>
+
+        <section id="gestion-commentaires" class="hidden">
+            <h1>comment</h1>
+        </section>
 
         <!-- utilisateur script -->
         <script>

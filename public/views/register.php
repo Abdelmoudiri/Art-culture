@@ -17,7 +17,7 @@
                 </div>
                 <div class="w-full lg:w-7/12 bg-white p-5 sm:rounded-3xl rounded-lg lg:rounded-l-none shadow-lg">
                     <h3 class="py-4 text-2xl text-center text-gray-800">Create an Account!</h3>
-                    <form id="registerForm" class="px-8 pt-6 pb-8 mb-4">
+                    <form id="registerForm" method="post" action="index.php?action=register" class="px-8 pt-6 pb-8 mb-4">
                         <div class="mb-4 md:flex md:justify-between">
                             <div class="mb-4 md:mr-2 md:mb-0">
                                 <label class="block mb-2 text-sm font-bold text-gray-700" for="firstName">
@@ -25,7 +25,7 @@
                                 </label>
                                 <input
                                     class="w-full px-3 py-2 text-sm leading-tight text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-cyan-500"
-                                    id="firstName" type="text" placeholder="First Name"/>
+                                    id="firstName" type="text" name="prenom" placeholder="First Name"/>
                                 <div id="errorFirstName" class="text-red-500 text-xs mt-1"></div>
                             </div>
                             <div class="md:ml-2">
@@ -34,8 +34,8 @@
                                 </label>
                                 <input
                                     class="w-full px-3 py-2 text-sm leading-tight text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-cyan-500"
-                                    id="lastName" type="text" placeholder="Last Name"/>
-                                <div id="errorLastName" class="text-red-500 text-xs mt-1"></div>
+                                    id="lastName" type="text" name="nom" placeholder="Last Name"/>
+                                <div id="errorLastName"  class="text-red-500 text-xs mt-1"></div>
                             </div>
                         </div>
                         <div class="mb-4">
@@ -44,7 +44,7 @@
                             </label>
                             <input
                                 class="w-full px-3 py-2 text-sm leading-tight text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-cyan-500"
-                                id="email" type="email" placeholder="Email"/>
+                                id="email" type="email" name="email" placeholder="Email"/>
                             <div id="errorEmail" class="text-red-500 text-xs mt-1"></div>
                         </div>
                         <div class="mb-4 md:flex md:justify-between">
@@ -54,7 +54,7 @@
                                 </label>
                                 <input
                                     class="w-full px-3 py-2 text-sm leading-tight text-gray-700 border-b-2 border-gray-300 focus:outline-none focus:border-cyan-500"
-                                    id="password" type="password" placeholder="******************"/>
+                                    id="password" name="password" type="password" placeholder="******************"/>
                                 <div id="errorPassword" class="text-red-500 text-xs mt-1"></div>
                             </div>
                             <div class="md:ml-2">
@@ -78,7 +78,7 @@
 </div>
 
                         <div class="relative">
-                <select id="countries" class="bg-gray-50 border border-gray-300 my-3 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block mx-auto p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                <select id="countries" name="role" class="bg-gray-50 border border-gray-300 my-3 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block mx-auto p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                     <option selected>Choose yor Role</option>
                     <option value="auteur">Auteur</option>
                     <option value="visiteur">Visiteur</option>

@@ -52,13 +52,51 @@ class Article
             throw new Exception("Erreur lors de l'insertion de l'article : " . $e->getMessage());
         }
     }
+    public static function getArticlesByCategory($categorie_id)
+    {
+        try {
+            $pdo = DatabaseConnection::getInstance()->getConnection();
+            $query = "SELECT a.*, c.nom AS nom_categorie 
+                      FROM Article a 
+                      JOIN Categorie c ON a.id_categorie = c.id_categorie";
+            
+            if ($categorie_id) {
+                $query .= " WHERE a.id_categorie = :categorie_id";
+            }
 
-    // Méthode pour récupérer tous les articles
+            $stmt = $pdo->prepare($query);
+
+            if ($categorie_id) {
+                $stmt->execute(['categorie_id' => $categorie_id]);
+            } else {
+                $stmt->execute();
+            }
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Erreur lors de la récupération des articles : " . $e->getMessage());
+        }
+    }
+
     public static function getAll()
     {
         try {
             $pdo = DatabaseConnection::getInstance()->getConnection();
-            $sql = "SELECT * FROM Article";
+            $sql = "SELECT Article.id_article, 
+                            Article.titre, 
+                            Article.content, 
+                            Article.datePublication, 
+                            Article.image, 
+                            Article.etat, 
+                            Categorie.id_categorie, 
+                            Categorie.nom AS nom_categorie
+                        FROM 
+                            Article
+                        LEFT JOIN 
+                            Categorie 
+                        ON 
+                            Article.id_categorie = Categorie.id_categorie;
+                        ";
             $stmt = $pdo->query($sql);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -174,6 +212,21 @@ public static function delete(int $idArticle)
     }
 }
 
+
+    public static function getArticles($limit = 10, $offset = 0)
+    {
+        try {
+            $pdo = DatabaseConnection::getInstance()->getConnection();
+            $sql = "SELECT * FROM Article LIMIT :offset, :limit";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Erreur lors de la récupération des articles : " . $e->getMessage());
+        }
+    }
 
     public static function getArticleById_user($id) {
         try {
